@@ -190,14 +190,38 @@ sap.ui.define([
            oInputModel.clearVendorData();
             var oInputData  =   oInputModel.getData();
 
-            try {
-                BusyIndicator.show(0);
-                var oResult = await oOrderModel.getVendorData(oInputData.Vendor);
-                oInputModel.setVendorData(oResult);                
-                BusyIndicator.hide(0);
-            } catch (oError) {
-                BusyIndicator.hide(0);
+            if (oInputData.Vendor) {
+
+                try {
+                    BusyIndicator.show(0);
+                    var oResult = await oOrderModel.getVendorData(oInputData.Vendor);
+                    oInputModel.setVendorData(oResult);                
+                    BusyIndicator.hide(0);
+                } catch (oError) {
+                    BusyIndicator.hide(0);
+                }
+
             }
+       },
+
+       goToComponent: async function(oOrderModel, oInputModel, oScreenManager) {
+           oInputModel.clearStandardPacking();
+           var oInputData   =   oInputModel.getData();
+
+           try {
+                BusyIndicator.show(0);
+                var oResult = await oOrderModel.getStandardPackingData(oInputData.Material,
+                                                                       oInputData.OrderNo,
+                                                                       oInputData.RackID,
+                                                                       oInputData.RackNo,
+                                                                       oInputData.TransportationType);
+                oInputModel.setStandardPacking(oResult);
+                oScreenManager.loadFragment("Component");
+                BusyIndicator.hide();
+           } catch (oError) {
+                BusyIndicator.hide(0);
+                throw oError;
+           }
        }
     });
 });

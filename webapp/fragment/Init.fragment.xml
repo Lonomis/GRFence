@@ -70,6 +70,7 @@
                         <f:fields>
                             <Input  value="{input>/TransportationType}"
                                     maxLength="4"
+                                    submit="onGetData"
                                     required="true">
                                 <layoutData>
                                     <l:GridData span="XL2 L2 M2 S4"/>
@@ -96,6 +97,7 @@
                         <f:fields>
                             <Input  value="{input>/RackNo}"
                                     maxLength="2"
+                                    submit="onGetData"
                                     required="true">
                                 <layoutData>
                                     <l:GridData span="XL2 L2 M2 S4"/>

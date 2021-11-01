@@ -9,7 +9,10 @@
 	<Shell id="shell">
 		<App id="app">
 			<pages>
-				<Page id="page" title="{i18n>title}">
+				<Page id="page" title="{i18n>title}"
+                      showNavButton="{= !!(${fragment>/activeFragment} === 'ScannedList' ||
+                                        ${fragment>/activeFragment} === 'Component')}"
+                      navButtonPress="onBack">
 					<content>
 						<VBox	id="contentVBox"/>
 						<l:VerticalLayout	id="messageStripArea"
@@ -43,9 +46,6 @@
 									visible="{= ${fragment>/activeFragment} === 'Init'
 											&amp;&amp;!!${scannedData>/OrderCount}}"
 									press="onSave"/>
-								<Button	text="{i18n>back}"
-									visible="{= ${fragment>/activeFragment} === 'ScannedList'}"
-									press="onScannedListBack"/>
 							</content>
 						</OverflowToolbar>
 					</footer>

@@ -22,12 +22,40 @@ sap.ui.define([
                 WBS                     :   "",
                 ProductionVersion       :   "",
                 RackID                  :   "",
-                Count                   :   0,
                 StorageLocation         :   "",
                 Reject                  :   "",
                 Vendor                  :   "",
-                VendorName              :   ""
+                VendorName              :   "",
+                Component               :   "",
+                ComponentName           :   "",
+                StandardPacking         :   [],
+                ComponentList           :   []
             }
+        },
+
+        getInitialStandardPacking   :   function(){
+            return {
+                Material                :   "",
+                Component               :   "",
+                Number                  :   "",
+                TransportationType      :   "",
+                NetWeight               :   "",
+                RackNo                  :   "",
+                Item                    :   "",
+                Pallet                  :   "",
+                House                   :   "",
+                DeliveryDate            :   "",
+                Sequence                :   "",
+            }
+        },
+
+        getInitialComponent         :   function(){
+            return {
+                itemNo                  :   "",
+                RejectSloc              :   "",
+                Item                    :   "",
+                Count                   :   0,
+            }  
         },
 
         setModel    :   function(oView, sModelName){
@@ -54,6 +82,10 @@ sap.ui.define([
             oData.Reject                =   oInputdata.Reject;
             oData.Vendor                =   oInputdata.Vendor;
             oData.VendorName            =   oInputdata.VendorName;
+            oData.Component             =   oInputdata.Component;
+            oData.ComponentName         =   oInputdata.ComponentName;
+            oData.StandardPacking       =   oInputdata.StandardPacking;
+            oData.ComponentList         =   oInputdata.ComponentList;
 
             this._oModel.setData(oData);
         },
@@ -91,6 +123,28 @@ sap.ui.define([
             this.setData(oData);
         },
 
+        setStandardPacking: function(oResult) {
+            var oInputData = this.getData();
+
+            oResult.details.forEach(function(oData){
+                oInputData.StandardPacking.push({
+                    Material                :   oData.Material,
+                    Component               :   oData.Component,
+                    Number                  :   oData.Number,
+                    TransportationType      :   oData.TransportationType,
+                    NetWeight               :   oData.NetWeight,
+                    RackNo                  :   oData.RackNo,
+                    Item                    :   oData.Item,
+                    Pallet                  :   oData.Pallet,
+                    House                   :   oData.House,
+                    DeliveryDate            :   oData.DeliveryDate,
+                    Sequence                :   oData.Sequence
+                });
+            });
+
+            this.setData(oInputData);
+        },
+
         clearVendorData: function(){
             var oData   =   this.getData();
 
@@ -108,6 +162,14 @@ sap.ui.define([
             oData.ProductionVersion     =   "";
             oData.RackID                =   "";
             oData.StorageLocation       =   "";
+
+            this.setData(oData);
+        },
+
+        clearStandardPacking: function() {
+            var oData = this.getData();
+
+            oData.StandardPacking       =   [];
 
             this.setData(oData);
         }

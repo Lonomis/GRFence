@@ -122,7 +122,7 @@ sap.ui.define([
 														  this.getView());
             },
             
-             onGetVendorData: function(oEvent){
+            onGetVendorData: function(oEvent){
                 MainControllerHelper.clearMessages(this.MessageStrip, this.MessagePopover, this.InputModel);
                 MainControllerHelper.getVendorData(this.OrderModel, this.InputModel);
             },
@@ -130,6 +130,8 @@ sap.ui.define([
             onNext: function(oEvent){
                 MainControllerHelper.clearMessages(this.MessageStrip, this.MessagePopover, this.InputModel);
                 MainControllerHelper.validateRequiredFields(this.MessagePopover);
+                MainControllerHelper.getVendorData(this.OrderModel, this.InputModel);
+                MainControllerHelper.goToComponent(this.OrderModel, this.InputModel, this.ScreenManager);
             },
 
             onScanSloc: async function(oEvent){
@@ -154,6 +156,11 @@ sap.ui.define([
 				} catch (oError) {
 					
 				}                
+            },
+
+            onBack: function(oEvent) {
+                MainControllerHelper.clearMessages(this.MessageStrip, this.MessagePopover, this.InputModel);
+                this.ScreenManager.loadFragment("Init");
             }
 		});
 	});

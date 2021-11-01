@@ -142,6 +142,42 @@ sap.ui.define([
             return {
                 "Vendor"    :   (!sVendor? "" : sVendor)
             };
+        },
+
+        getStandardPackingData: function(sMaterial, sOrderNo, sRackID, sRackNo, sTransportationType) {
+            var that = this;
+            var oParameters =   this.buildGetStdPackingParameter(sMaterial, sOrderNo, sRackID,
+                                                                 sRackNo, sTransportationType);
+
+            return new Promise(function(resolve, reject){
+               that._OrderModel.callFunction("/GetStandardPacking", {
+                    method          :   "GET",
+                    urlParameters   :   oParameters,
+                    success         :   function(oData){
+                        resolve({
+                            status  :   that.SuccessStatus,
+                            details :   oData.results
+                        })
+                    },
+                    error           :   function(oError){
+                        reject({
+                            status  :   that.ErrorStatus,
+                            details :   oError
+                        })
+                    }
+               })
+            });
+        },
+        
+        buildGetStdPackingParameter: function(sMaterial, sOrderNo, sRackID,
+                                              sRackNo, sTransportationType) {
+            return {
+                "Material"              :   (!sMaterial? "" : sMaterial),
+                "OrderNo"               :   (!sOrderNo? "" : sOrderNo),
+                "RackId"                :   (!sRackID? "" : sRackID),
+                "RackNo"                :   (!sRackNo? "" : sRackNo),
+                "TransportationType"    :   (!sTransportationType? "": sTransportationType)
+            };
         }
     });
 });
