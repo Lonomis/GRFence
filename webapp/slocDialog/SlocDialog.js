@@ -15,9 +15,13 @@ sap.ui.define([
         openDialog: async function(oView) {
             var oInputData  =   this._inputModel.getData();
 
-            BusyIndicator.show(0);
-            var oResult = await this._slocModel.buildSlocList(oInputData.ProductionOrder);
-            BusyIndicator.hide();
+            try {
+                BusyIndicator.show(0);
+                var oResult = await this._slocModel.buildSlocList("QC", oInputData.Plant);
+                BusyIndicator.hide();
+            } catch (oError) {
+                BusyIndicator.hide();
+            }
 
             this.buildDialog(oView);
 

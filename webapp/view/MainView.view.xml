@@ -27,26 +27,10 @@
 									visible="{=!!${messages>/}.length}"
 									press="onMessagePopover"/>
 								<ToolbarSpacer/>
-								<Button 
-									id="barcodeScannerId"
-									text="{i18n>scan}"
-									visible="{= ${barcode>/available}
-											&amp;&amp;${fragment>/activeFragment} === 'Init'}"
-									icon="sap-icon://bar-code"
-									press="onScan"/>
-								<Button
-									text="{i18n>scannedList}"
-									visible="{= ${fragment>/activeFragment} === 'Init'
-											&amp;&amp;!!${scannedData>/OrderCount}}"
-									press="onScannedList"/>
 								<Button
 									text="{i18n>cancel}"
 									type="Reject"
-									visible="{= ${fragment>/activeFragment} === 'Init'
-											&amp;&amp;(!!${input>/ProductionOrder}
-											||!!${input>/Count}
-											||!!${input>/StorageLocation}
-											||!!${input>/Vendor})}"
+									visible="{= ${fragment>/activeFragment} === 'Init'}"
 									press="onCancel"/>
 								<Button
 									text="{i18n>next}"

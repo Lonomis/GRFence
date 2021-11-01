@@ -32,12 +32,16 @@
                         <f:fields>
                             <Input  value="{input>/ProductionOrder}" 
                                     maxLength="12"
+                                    submit="onGetData"
                                     required="true">
                                 <layoutData>
-                                    <l:GridData span="XL3 L3 M3 S8"/>
+                                    <l:GridData span="XL2 L2 M2 S6"/>
                                 </layoutData>
                                 <customData>
                                     <core:CustomData key="required"
+                                                     value="true"
+                                                     writeToDom="true"/>
+                                    <core:CustomData key="requiredOrder"
                                                      value="true"
                                                      writeToDom="true"/>
                                     <core:CustomData key="name"
@@ -49,23 +53,64 @@
                     </f:FormElement>
                     <f:FormElement>
                         <f:fields>
-                            <Button text="{i18n>getData}"
-                                    press="onGetData">
+                            <Button text="{i18n>scan}"
+                                    press="onScanOrder"
+									visible="{= ${barcode>/available}}">
                                 <layoutData>
-                                    <l:GridData span="XL2 L2 M2 S4"/>
+                                    <l:GridData span="XL2 L2 M2 S6"/>
                                 </layoutData>
                             </Button>
                         </f:fields>
                     </f:FormElement>
                     <f:FormElement>
                         <f:label>
-                            <Label  text="{i18n>material}"
+                            <Label  text="{i18n>transportationType}"
                                     design="Bold"/>
                         </f:label>
                         <f:fields>
-                            <Input  value="{input>/Material}"
-                                    maxLength="40"
-                                    editable="false">
+                            <Input  value="{input>/TransportationType}"
+                                    maxLength="4"
+                                    required="true">
+                                <layoutData>
+                                    <l:GridData span="XL2 L2 M2 S4"/>
+                                </layoutData>
+                                <customData>
+                                    <core:CustomData key="required"
+                                                     value="true"
+                                                     writeToDom="true"/>
+                                    <core:CustomData key="requiredOrder"
+                                                     value="true"
+                                                     writeToDom="true"/>
+                                    <core:CustomData key="name"
+                                                     value="{i18n>transportationType}"
+                                                     writeToDom="true"/>
+                                </customData>
+                            </Input>
+                        </f:fields>
+                    </f:FormElement>
+                    <f:FormElement>
+                        <f:label>
+                            <Label  text="{i18n>rackNo}"
+                                    design="Bold"/>
+                        </f:label>
+                        <f:fields>
+                            <Input  value="{input>/RackNo}"
+                                    maxLength="2"
+                                    required="true">
+                                <layoutData>
+                                    <l:GridData span="XL2 L2 M2 S4"/>
+                                </layoutData>
+                                <customData>
+                                    <core:CustomData key="required"
+                                                     value="true"
+                                                     writeToDom="true"/>
+                                    <core:CustomData key="requiredOrder"
+                                                     value="true"
+                                                     writeToDom="true"/>
+                                    <core:CustomData key="name"
+                                                     value="{i18n>rackNo}"
+                                                     writeToDom="true"/>
+                                </customData>
                             </Input>
                         </f:fields>
                     </f:FormElement>
@@ -75,50 +120,21 @@
                                     design="Bold"/>
                         </f:label>
                         <f:fields>
-                            <Input  value="{input>/WBS}"
-                                    maxLength="24"
-                                    editable="false">
-                            </Input>
+                            <Text   text="{input>/WBS}"/>
                         </f:fields>
                     </f:FormElement>
                     <f:FormElement>
                         <f:label>
-                            <Label  text="{i18n>materialName}"
+                            <Label  text="{i18n>material}"
                                     design="Bold"/>
                         </f:label>
                         <f:fields>
-                            <Input  value="{input>/MaterialName}"
-                                    maxLength="40"
-                                    editable="false">
-                            </Input>
+                            <Text   text="{input>/Material}"/>
                         </f:fields>
                     </f:FormElement>
                     <f:FormElement>
                         <f:label>
-                            <Label  text="{i18n>count}"
-                                    design="Bold"/>
-                        </f:label>
-                        <f:fields>
-                            <Input  value="{input>/Count}"
-                                    type="Number"
-                                    required="true">
-                                <layoutData>
-                                    <l:GridData span="XL1 L1 M1 S2"/>
-                                </layoutData>
-                                <customData>
-                                    <core:CustomData key="required"
-                                                     value="true"
-                                                     writeToDom="true"/>
-                                    <core:CustomData key="name"
-                                                     value="{i18n>count}"
-                                                     writeToDom="true"/>
-                                </customData>
-                            </Input>
-                        </f:fields>
-                    </f:FormElement>
-                    <f:FormElement>
-                        <f:label>
-                            <Label  text="{=${input>/Reject}? ${i18n>slocReject} : ${i18n>moveToSloc}}"
+                            <Label  text="{i18n>moveToSloc}"
                                     design="Bold"/>
                         </f:label>
                         <f:fields>
@@ -129,14 +145,14 @@
                                     type="Text"
                                     required="true">
                                 <layoutData>
-                                    <l:GridData span="XL3 L3 M3 S8"/>
+                                    <l:GridData span="XL2 L2 M2 S6"/>
                                 </layoutData>
                                 <customData>
                                     <core:CustomData key="required"
                                                      value="true"
                                                      writeToDom="true"/>
                                     <core:CustomData key="name"
-                                                     value="{=${input>/Reject}? ${i18n>slocReject} : ${i18n>moveToSloc}}"
+                                                     value="{i18n>moveToSloc}"
                                                      writeToDom="true"/>
                                 </customData>
                             </Input>
@@ -144,13 +160,37 @@
                     </f:FormElement>
                     <f:FormElement>
                         <f:fields>
-                            <Button text="{=${input>/Reject}? ${i18n>pass} : ${i18n>reject}}"
-                                    type="{=${input>/Reject}? 'Accept' : 'Reject'}"
-                                    press="onPressReject">
+                            <Button text="{i18n>scanSloc}"
+                                    press="onScanSloc"
+									visible="{= ${barcode>/available}}">
+                                <layoutData>
+                                    <l:GridData span="XL2 L2 M2 S6"/>
+                                </layoutData>
+                            </Button>
+                        </f:fields>
+                    </f:FormElement>
+                    <f:FormElement>
+                        <f:label>
+                            <Label  text="{i18n>rackId}"
+                                    design="Bold"/>
+                        </f:label>
+                        <f:fields>
+                            <Input  value="{input>/RackID}"
+                                    maxLength="5"
+                                    type="Text"
+                                    required="true">
                                 <layoutData>
                                     <l:GridData span="XL2 L2 M2 S4"/>
                                 </layoutData>
-                            </Button>
+                                <customData>
+                                    <core:CustomData key="required"
+                                                     value="true"
+                                                     writeToDom="true"/>
+                                    <core:CustomData key="name"
+                                                     value="{i18n>rackId}"
+                                                     writeToDom="true"/>
+                                </customData>
+                            </Input>
                         </f:fields>
                     </f:FormElement>
                     <f:FormElement>
@@ -160,29 +200,21 @@
                         </f:label>
                         <f:fields>
                             <Input  value="{input>/Vendor}"
-                                    required="true"
+                                    submit="onGetVendorData"
                                     maxLength="10">
                                 <layoutData>
-                                    <l:GridData span="XL2 L2 M2 S4"/>
+                                    <l:GridData span="XL2 L2 M2 S6"/>
                                 </layoutData>
-                                <customData>
-                                    <core:CustomData key="required"
-                                                     value="true"
-                                                     writeToDom="true"/>
-                                    <core:CustomData key="name"
-                                                     value="{i18n>vendor}"
-                                                     writeToDom="true"/>
-                                </customData>
                             </Input>
                         </f:fields>
                     </f:FormElement>
                     <f:FormElement>
                         <f:label>
-                            <Label  text="{i18n>orderCount}"
+                            <Label  text="{i18n>vendorName}"
                                     design="Bold"/>
                         </f:label>
                         <f:fields>
-                            <Text  text="{scannedData>/OrderCount}"/>
+                            <Text   text="{input>/VendorName}"/>
                         </f:fields>
                     </f:FormElement>
                 </f:formElements>

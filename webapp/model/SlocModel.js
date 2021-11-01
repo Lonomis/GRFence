@@ -18,11 +18,11 @@ sap.ui.define([
             this._OrderModel = oModel;
         },
 
-        buildSlocList: function(sProductionOrder){
+        buildSlocList: function(sObject, sPlant){
             var that        =   this;
 
             return new Promise(function(resolve, reject){
-                that.getSlocList(sProductionOrder).then(
+                that.getSlocList(sObject, sPlant).then(
                     function(oResult){
                         that.setSlocData(oResult, that._SlocModel);
                         resolve({
@@ -53,12 +53,12 @@ sap.ui.define([
             }
         },
 
-        getSlocList: function(sProductionOrder){
+        getSlocList: function(sObject, sPlant){
             var that = this;
-            var oParameters = this.buildGetPCFSlocParameters(sProductionOrder);
+            var oParameters = this.buildGetSlocParameters(sObject, sPlant);
 
             return new Promise(function(resolve, reject){
-                that._OrderModel.callFunction("/GetPCFSloc", {
+                that._OrderModel.callFunction("/GetSloc", {
                     method          :   "GET",
                     urlParameters   :   oParameters,
                     success         :   function(oData) {
@@ -77,9 +77,10 @@ sap.ui.define([
             })
         },
 
-        buildGetPCFSlocParameters: function(sProductionOrder){
+        buildGetSlocParameters: function(sObject, sPlant){
             return {
-                "OrderNo" : (!sProductionOrder ? "" : sProductionOrder)
+                "Object" : sObject,
+                "Plant"  : (!sPlant ? "1100" : sPlant)
             }
         },
 

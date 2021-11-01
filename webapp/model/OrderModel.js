@@ -18,18 +18,20 @@ sap.ui.define([
             this._OrderModel    =   oModel;
         },
 
-        getOrderData: function(sOrderNo){
+        getOrderData: function(sOrderNo, sTransportationType, sRackNo){
             var that = this;
-            var oParameters = this.buildGetOrderParameter(sOrderNo);
+            var oParameters = this.buildGetOrderParameter(sOrderNo,
+                                                          sTransportationType,
+                                                          sRackNo);
 
             return new Promise(function(resolve, reject){
-                that._OrderModel.callFunction("/GetPCOrder", {
+                that._OrderModel.callFunction("/GetOrder", {
                     method          :   "GET",
                     urlParameters   :   oParameters,
                     success         :   function(oData) {
                         resolve({
                             status  :   that.SuccessStatus,
-                            details :   oData.GetPCOrder
+                            details :   oData.GetOrder
                         })
                     },
                     error           :   function(oError) {
@@ -42,11 +44,12 @@ sap.ui.define([
             });
         },
 
-        buildGetOrderParameter: function(sOrderNo){
+        buildGetOrderParameter: function(sOrderNo, sTransportationType, sRackNo){
             return {
                 "OrderNo"               :   ( !sOrderNo ? "" : sOrderNo),
-                "RackNo"                :   "00",
-                "TransportationType"    :   "0"
+                "RackNo"                :   ( !sRackNo ? "" : sRackNo),
+                "TransportationType"    :   ( !sTransportationType ? "" : sTransportationType),
+                "Flag"                  :   "X"
             }
         },
 
@@ -109,6 +112,36 @@ sap.ui.define([
 
         getPostErrorMessage: function(oInputData) {
             return this._ResourceBundle.getText("post.Error");
+        },
+
+        getVendorData: async function(sVendor) {
+            var that = this;
+            var oParameters =   this.buildGetVendorDataParameter(sVendor);
+
+            return new Promise(function(resolve, reject){
+               that._OrderModel.callFunction("/GetVendorData", {
+                    method          :   "GET",
+                    urlParameters   :   oParameters,
+                    success         :   function(oData){
+                        resolve({
+                            status  :   that.SuccessStatus,
+                            details :   oData.GetVendorData
+                        })
+                    },
+                    error           :   function(oError){
+                        reject({
+                            status  :   that.ErrorStatus,
+                            details :   oError
+                        })
+                    }
+               })
+            });
+        },
+
+        buildGetVendorDataParameter: function(sVendor) {
+            return {
+                "Vendor"    :   (!sVendor? "" : sVendor)
+            };
         }
     });
 });

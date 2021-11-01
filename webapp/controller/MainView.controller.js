@@ -92,6 +92,68 @@ sap.ui.define([
 
                 //Instantiate Message Strip
                 this.MessageStrip = new MessageStrip(this.getView().byId("messageStripArea"));       
-			}
+            },
+            
+            onMessagePopover: function(oEvent){
+                var oButtonPopover  =   this.getView().byId("messagePopOverButton");
+
+                this.MessagePopover.openMessagePopover(oButtonPopover, oEvent);
+            },
+
+            onGetData: function() {
+                try {
+                    MainControllerHelper.clearMessages(this.MessageStrip, this.MessagePopover, this.InputModel);
+                    this.InputModel.clearOrderData();
+                    MainControllerHelper.validateRequiredFieldsOrder(this.MessagePopover);
+                    MainControllerHelper.getOrderData(this.OrderModel, this.InputModel);
+                } catch (oError) {
+
+                }
+            },
+
+            onCancel: function(){
+                MainControllerHelper.clearMessages(this.MessageStrip, this.MessagePopover, this.InputModel);
+                this.InputModel.clearData();
+            },
+
+			onSLocSearch: function(oEvent){
+				MainControllerHelper.clearMessages(this.MessageStrip, this.MessagePopover, this.InputModel);
+				MainControllerHelper.openSlocSearchDialog(this.SlocDialog,
+														  this.getView());
+            },
+            
+             onGetVendorData: function(oEvent){
+                MainControllerHelper.clearMessages(this.MessageStrip, this.MessagePopover, this.InputModel);
+                MainControllerHelper.getVendorData(this.OrderModel, this.InputModel);
+            },
+
+            onNext: function(oEvent){
+                MainControllerHelper.clearMessages(this.MessageStrip, this.MessagePopover, this.InputModel);
+                MainControllerHelper.validateRequiredFields(this.MessagePopover);
+            },
+
+            onScanSloc: async function(oEvent){
+				MainControllerHelper.clearMessages(this.MessageStrip, this.MessagePopover, this.InputModel);
+				this.InputModel.clearData();
+
+				try{
+					var oResult 	= 	await this.BarcodeScanner.scanSloc();
+					this.InputModel.setSlocFromBarcode(oResult.details);
+				} catch (oError) {
+					
+				}                
+            },
+
+            onScanOrder: async function(oEvent){
+				MainControllerHelper.clearMessages(this.MessageStrip, this.MessagePopover, this.InputModel);
+				this.InputModel.clearData();
+
+				try{
+					var oResult 	= 	await this.BarcodeScanner.scanOrder();
+					this.InputModel.setOrderFromBarcode(oResult.details);
+				} catch (oError) {
+					
+				}                
+            }
 		});
 	});

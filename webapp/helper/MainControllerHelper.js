@@ -15,12 +15,15 @@ sap.ui.define([
             supportedLocales:   [""],
             fallbackLocales:    ""
         }).getResourceBundle(),
+
         getOrderData :   async function(oOrderModel, oInputModel) {
             var oInputData = oInputModel.getData();
 
             try {
                 BusyIndicator.show(0);
-                var oResult = await oOrderModel.getOrderData(oInputData.ProductionOrder);
+                var oResult = await oOrderModel.getOrderData(oInputData.ProductionOrder,
+                                                             oInputData.TransportationType,
+                                                             oInputData.RackNo);
                 BusyIndicator.hide();
             
                 if (oResult.status === oOrderModel.SuccessStatus) {
@@ -34,12 +37,14 @@ sap.ui.define([
 
        setOrderData : function(oInputData, oResultData){
             oInputData.ProductionOrder      =   oResultData.OrderNo;
+            oInputData.TransportationType   =   oResultData.TransportationType;
+            oInputData.RackNo               =   oResultData.RackNo;
             oInputData.Material			    =	oResultData.Material;
-            oInputData.MaterialName		    =	oResultData.MaterialName;
             oInputData.WBS				    =	oResultData.WBS;
             oInputData.Plant                =   oResultData.Plant;
             oInputData.StorageLocation	    =	oResultData.StorageLocation;
             oInputData.ProductionVersion    =   oResultData.ProductionVersion;
+            oInputData.RackID               =   oResultData.RackID;
        },
        
        openSlocSearchDialog : function(oSlocDialog, oView){
@@ -76,6 +81,31 @@ sap.ui.define([
 
        validateRequiredFields : function(oMessagePopover){
             var aRequiredFields         = this.getFields('[data-required="true"]');
+            var aMessages               = [];
+            var aViolation              = [];
+            var sMessage                = "";
+
+            aRequiredFields.forEach((requiredField)=>{
+                let oField = sap.ui.getCore().byId(requiredField.id);
+                if (oField.getValue && !oField.getValue()) {
+                    sMessage = this._ResourceBundle.getText("validate.required", [requiredField.name]);
+                    aMessages.push(sMessage);
+                    aViolation.push("required");
+                    oMessagePopover.addMessage(sMessage, this._MessageType.Error);
+
+                    this.setValueState(oField, this._ValueState.Error, sMessage);
+                } else {
+                    this.setValueState(oField, this._ValueState.None, "");
+                }
+            });
+
+            if (aMessages.length > 0) {
+                throw new ValidateException(this.combineMessages(aMessages), aViolation);
+            }
+       },
+
+       validateRequiredFieldsOrder : function(oMessagePopover){
+            var aRequiredFields         = this.getFields('[data-requiredOrder="true"]');
             var aMessages               = [];
             var aViolation              = [];
             var sMessage                = "";
@@ -154,6 +184,20 @@ sap.ui.define([
             });
 
             return aRequireFieldId;
+       },
+       
+       getVendorData: async function(oOrderModel, oInputModel) {
+           oInputModel.clearVendorData();
+            var oInputData  =   oInputModel.getData();
+
+            try {
+                BusyIndicator.show(0);
+                var oResult = await oOrderModel.getVendorData(oInputData.Vendor);
+                oInputModel.setVendorData(oResult);                
+                BusyIndicator.hide(0);
+            } catch (oError) {
+                BusyIndicator.hide(0);
+            }
        }
     });
 });
