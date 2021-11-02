@@ -66,6 +66,10 @@ sap.ui.define([
             }
 
             return oFragment;
+        },
+
+        getActiveFragment: function(){
+            return this.FragmentModel.getActiveFragment();
         }
         
     });

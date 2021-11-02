@@ -19,21 +19,19 @@ sap.ui.define([
             oView.setModel(BarcodeScannerControl.getStatusModel(), this._StatusModelName);
         },
         
-        scanOrder : function(){
+        scanOrder : function(oInputModel){
             var that  = this;
+            oInputModel.clearOrderData();
 
             return new Promise(function(resolve, reject){
                 BarcodeScannerControl.scan(
                     //Scan Successfully
                     function(oResult) {
                         if (oResult.text){
+                            oInputModel.setOrderFromBarcode(oResult.text);
+
                             resolve({
-                                status  :   that.SuccessStatus,
-                                details :   {
-                                    ProductionOrder     :   (oResult.text.length >= 12 ? oResult.text.substring(4,16) : oResult.text),
-                                    TransportationType  :   (oResult.text.length >= 24 ? oResult.text.substring(24,24) : oResult.text),
-                                    RackNo              :   (oResult.text.length >= 22 ? oResult.text.substring(22,23) : oResult.text)
-                                }
+                                status  :   that.SuccessStatus
                             });
                         } else {
                             resolve({
@@ -57,19 +55,53 @@ sap.ui.define([
             });
         },
 
-        scanSloc : function(){
+        scanSloc : function(oInputModel){
             var that  = this;
-
+            oInputModel.clearSlocData();
+            
             return new Promise(function(resolve, reject){
                 BarcodeScannerControl.scan(
                     //Scan Successfully
                     function(oResult) {
                         if (oResult.text){
+                            oInputModel.setSlocFromBarcode(oResult.text);
                             resolve({
-                                status  :   that.SuccessStatus,
-                                details :   {
-                                    StorageLocation     :   (oResult.text.length >= 1 ? oResult.text.substring(1,4) : oResult.text)
-                                }
+                                status  :   that.SuccessStatus
+                            });
+                        } else {
+                            resolve({
+                                status  :   that.CancelStatus
+                            })
+                        }
+                    }, 
+                    //Scan Failure
+                    function(sError) {
+                        reject({
+                            status  :   that.ErrorStatus,
+                            details :   sError
+                        });
+                    }, 
+                    //Live Update
+                    function(oParams) {
+                        //Do Nothing
+                    },
+                    that._sDialogTitle
+                );
+            });
+        },
+
+        scanComponent : function(oInputModel){
+            var that  = this;
+            oInputModel.clearComponentData();
+            
+            return new Promise(function(resolve, reject){
+                BarcodeScannerControl.scan(
+                    //Scan Successfully
+                    function(oResult) {
+                        if (oResult.text){
+                            oInputModel.setComponentFromBarcode(oResult.text);
+                            resolve({
+                                status  :   that.SuccessStatus
                             });
                         } else {
                             resolve({

@@ -17,59 +17,17 @@ sap.ui.define([
         }).getResourceBundle(),
 
         getOrderData :   async function(oOrderModel, oInputModel) {
-            var oInputData = oInputModel.getData();
-
             try {
                 BusyIndicator.show(0);
-                var oResult = await oOrderModel.getOrderData(oInputData.ProductionOrder,
-                                                             oInputData.TransportationType,
-                                                             oInputData.RackNo);
+                await oOrderModel.getOrderData(oInputModel);
                 BusyIndicator.hide();
-            
-                if (oResult.status === oOrderModel.SuccessStatus) {
-                    this.setOrderData(oInputData, oResult.details);
-                    oInputModel.setData(oInputData);
-                }
             } catch {
                 BusyIndicator.hide();
             }
        },
-
-       setOrderData : function(oInputData, oResultData){
-            oInputData.ProductionOrder      =   oResultData.OrderNo;
-            oInputData.TransportationType   =   oResultData.TransportationType;
-            oInputData.RackNo               =   oResultData.RackNo;
-            oInputData.Material			    =	oResultData.Material;
-            oInputData.WBS				    =	oResultData.WBS;
-            oInputData.Plant                =   oResultData.Plant;
-            oInputData.StorageLocation	    =	oResultData.StorageLocation;
-            oInputData.ProductionVersion    =   oResultData.ProductionVersion;
-            oInputData.RackID               =   oResultData.RackID;
-       },
        
        openSlocSearchDialog : function(oSlocDialog, oView){
             oSlocDialog.openDialog(oView);
-       },
-
-       keepInputData : async function(oInputModel, oOrderModel, oScannedDataModel) {
-        var oInputData = oInputModel.getData();
-        
-        try {
-            BusyIndicator.show(0);
-            var oResult = await oOrderModel.getOrderData(oInputData.ProductionOrder);
-            BusyIndicator.hide();
-            
-            if (oResult.status === oOrderModel.SuccessStatus) {
-                this.setOrderData(oInputData, oResult.details);
-            }
-
-            oScannedDataModel.appendScannedData(oInputData);
-
-            oInputModel.clearData();
-        } catch (oError) {
-            BusyIndicator.hide();
-        }
-
        },
 
        clearMessages : function(oMessageStrip, oMessagePopover, oInputModel) {
@@ -172,6 +130,15 @@ sap.ui.define([
                 throw new ValidateException(this.combineMessages(aMessages), aViolation);
             }
        },
+
+       resetInputValueState: function(){
+            var aRequiredFields         = this.getFields('[data-required="true"]');
+
+            aRequiredFields.forEach((requiredField)=>{
+                let oField = sap.ui.getCore().byId(requiredField.id);
+                this.setValueState(oField, this._ValueState.None, "");
+            });
+       },
        
        getFields : function(sSelector){
             var aRequireFieldId = [];
@@ -179,7 +146,7 @@ sap.ui.define([
             $(sSelector).each(function(){
                 aRequireFieldId.push({
                     id    : $(this).context.id,
-                    name  : $(this).context.attributes["data-name"].value
+                    name  : ($(this).context.attributes["data-name"].value? $(this).context.attributes["data-name"].value : "")
                 });
             });
 
@@ -187,41 +154,54 @@ sap.ui.define([
        },
        
        getVendorData: async function(oOrderModel, oInputModel) {
-           oInputModel.clearVendorData();
-            var oInputData  =   oInputModel.getData();
-
-            if (oInputData.Vendor) {
-
-                try {
+            oInputModel.clearVendorData();
+            try {
                     BusyIndicator.show(0);
-                    var oResult = await oOrderModel.getVendorData(oInputData.Vendor);
-                    oInputModel.setVendorData(oResult);                
+                    await oOrderModel.getVendorData(oInputModel);               
                     BusyIndicator.hide(0);
                 } catch (oError) {
                     BusyIndicator.hide(0);
                 }
-
-            }
        },
 
        goToComponent: async function(oOrderModel, oInputModel, oScreenManager) {
+           oInputModel.clearOrderData();
+           oInputModel.clearVendorData();
            oInputModel.clearStandardPacking();
-           var oInputData   =   oInputModel.getData();
 
            try {
                 BusyIndicator.show(0);
-                var oResult = await oOrderModel.getStandardPackingData(oInputData.Material,
-                                                                       oInputData.OrderNo,
-                                                                       oInputData.RackID,
-                                                                       oInputData.RackNo,
-                                                                       oInputData.TransportationType);
-                oInputModel.setStandardPacking(oResult);
+                await oOrderModel.getOrderData(oInputModel);
+                await oOrderModel.getVendorData(oInputModel);
+                await oOrderModel.getStandardPackingData(oInputModel);
                 oScreenManager.loadFragment("Component");
                 BusyIndicator.hide();
            } catch (oError) {
-                BusyIndicator.hide(0);
+                BusyIndicator.hide();
                 throw oError;
            }
-       }
+       },
+
+       combineMessages : function(aMessages) {
+		    if (aMessages.length === 1) {
+			    return aMessages[0];
+		    } else {
+			    return aMessages.join(". ") + ".";
+		    }
+        },
+        
+        saveComponent: async function(oOrderModel, oInputModel, oMessagePopover) {
+
+            try {
+                BusyIndicator.show(0);
+                await oOrderModel.getComponentData(oInputModel);
+                oInputModel.validateComponent();
+                oInputModel.appendComponentData();
+                BusyIndicator.hide();
+            } catch (oError) {
+                BusyIndicator.hide();
+                oMessagePopover.addMessage(oError, this._MessageType.Error);
+            }
+        }
     });
 });

@@ -11,7 +11,9 @@ sap.ui.define([
     "zmmo071101/barcodeScanner/BarcodeScanner",
     "zmmo071101/messageStrip/MessageStrip",
     "zmmo071101/helper/MainControllerHelper",
-    "zmmo071101/slocDialog/SlocDialog"
+    "zmmo071101/slocDialog/SlocDialog",
+    "zmmo071101/slocDialog/RejectSlocDialog",
+    "zmmo071101/formatter/Formatter"
 ],
 	/**
 	 * @param {typeof sap.ui.core.mvc.Controller} Controller
@@ -52,14 +54,22 @@ sap.ui.define([
 	/**
 	 * @param {typeof zmmo071101.slocDialog.SlocDialog} SlocDialog
 	 */
+	/**
+	 * @param {typeof zmmo071101.slocDialog.RejectSlocDialog} RejectSlocDialog
+	 */
+	/**
+	 * @param {typeof zmmo071101.formatter.Formatter} Formatter
+	 */
     function (Controller, BusyIndicator, Quantity, InputModel,
               OrderModel, SlocModel, ScannedDataModel,
               ScreenManager, MessagePopover, BarcodeScanner,
-              MessageStrip, MainControllerHelper, SlocDialog) {
+              MessageStrip, MainControllerHelper, SlocDialog,
+              RejectSlocDialog, Formatter) {
 		"use strict";
 
 		return Controller.extend("zmmo071101.controller.MainView", {
             quantityType: Quantity,
+            formatter: Formatter,
 
 			onInit: async function () {
                 //Instantiate Input Model
@@ -71,6 +81,9 @@ sap.ui.define([
 
                 //Instantiate Storage Location Model
                 this.SlocModel = new SlocModel(this.getView().getModel(), this.getView(), "sloc");
+
+                //Instantiate Reject Storage Location Model
+                this.RejectSlocModel = new SlocModel(this.getView().getModel(), this.getView(), "rejectSloc");
 
                 //Instantiate Scanned Data Model
                 this.ScannedDataModel = new ScannedDataModel(this.getView(), "scannedData");
@@ -86,12 +99,16 @@ sap.ui.define([
                 //Instantiate Sloc Dialog
                 this.SlocDialog = new SlocDialog(this.InputModel, this.SlocModel);
 
+                //Instantiate Reject Sloc Dialog
+                this.RejectSlocDialog = new RejectSlocDialog(this.InputModel, this.RejectSlocModel);
+
                 //Instantiate Message Popover
                 this.MessagePopover = new MessagePopover(this.getView());
                 this.MessagePopover.setMessageModel(this.getView());
 
                 //Instantiate Message Strip
-                this.MessageStrip = new MessageStrip(this.getView().byId("messageStripArea"));       
+                this.MessageStrip = new MessageStrip(this.getView().byId("messageStripArea")); 
+                
             },
             
             onMessagePopover: function(oEvent){
@@ -100,7 +117,7 @@ sap.ui.define([
                 this.MessagePopover.openMessagePopover(oButtonPopover, oEvent);
             },
 
-            onGetData: function() {
+            onGetData: async function() {
                 try {
                     MainControllerHelper.clearMessages(this.MessageStrip, this.MessagePopover, this.InputModel);
                     this.InputModel.clearOrderData();
@@ -121,6 +138,12 @@ sap.ui.define([
 				MainControllerHelper.openSlocSearchDialog(this.SlocDialog,
 														  this.getView());
             },
+
+            onRejectSLocSearch: function(oEvent){
+				MainControllerHelper.clearMessages(this.MessageStrip, this.MessagePopover, this.InputModel);
+				MainControllerHelper.openSlocSearchDialog(this.RejectSlocDialog,
+														  this.getView());
+            },
             
             onGetVendorData: function(oEvent){
                 MainControllerHelper.clearMessages(this.MessageStrip, this.MessagePopover, this.InputModel);
@@ -130,17 +153,20 @@ sap.ui.define([
             onNext: function(oEvent){
                 MainControllerHelper.clearMessages(this.MessageStrip, this.MessagePopover, this.InputModel);
                 MainControllerHelper.validateRequiredFields(this.MessagePopover);
-                MainControllerHelper.getVendorData(this.OrderModel, this.InputModel);
                 MainControllerHelper.goToComponent(this.OrderModel, this.InputModel, this.ScreenManager);
+            },
+
+            onNextItem: function(oEvent){
+                MainControllerHelper.clearMessages(this.MessageStrip, this.MessagePopover, this.InputModel);
+                MainControllerHelper.validateRequiredFields(this.MessagePopover);
+                MainControllerHelper.saveComponent(this.OrderModel, this.InputModel, this.MessagePopover);
             },
 
             onScanSloc: async function(oEvent){
 				MainControllerHelper.clearMessages(this.MessageStrip, this.MessagePopover, this.InputModel);
-				this.InputModel.clearData();
 
 				try{
-					var oResult 	= 	await this.BarcodeScanner.scanSloc();
-					this.InputModel.setSlocFromBarcode(oResult.details);
+					await this.BarcodeScanner.scanSloc(this.InputModel);
 				} catch (oError) {
 					
 				}                
@@ -148,19 +174,70 @@ sap.ui.define([
 
             onScanOrder: async function(oEvent){
 				MainControllerHelper.clearMessages(this.MessageStrip, this.MessagePopover, this.InputModel);
-				this.InputModel.clearData();
 
 				try{
-					var oResult 	= 	await this.BarcodeScanner.scanOrder();
-					this.InputModel.setOrderFromBarcode(oResult.details);
+                    await this.BarcodeScanner.scanOrder(this.InputModel);
+
+                    BusyIndicator.show(0);
+                    await this.OrderModel.getOrderData(this.InputModel);
+                    BusyIndicator.hide();
 				} catch (oError) {
-					
+					BusyIndicator.hide();
 				}                
+            },
+
+            onScanComponent: async function(oEvent){
+                MainControllerHelper.clearMessages(this.MessageStrip, this.MessagePopover, this.InputModel);
+
+                try{
+                    await this.BarcodeScanner.scanComponent(this.InputModel);
+
+                    BusyIndicator.show(0);
+                    await this.OrderModel.getComponentData(this.InputModel);
+                    BusyIndicator.hide();
+                } catch (oError) {
+                    BusyIndicator.hide();
+                }
             },
 
             onBack: function(oEvent) {
                 MainControllerHelper.clearMessages(this.MessageStrip, this.MessagePopover, this.InputModel);
-                this.ScreenManager.loadFragment("Init");
+                
+                switch (this.ScreenManager.getActiveFragment()) {
+                    case "Component":
+                        MainControllerHelper.resetInputValueState();
+                        this.InputModel.clearComponentPageData();
+                        this.ScreenManager.loadFragment("Init");
+                        break;
+                    case "ScannedList":
+                        this.ScreenManager.loadFragment("Component");
+                        break;
+                    default:
+                        break;
+                }
+                
+            },
+
+            onBackToScannedList: function(oEvent) {
+                MainControllerHelper.clearMessages(this.MessageStrip, this.MessagePopover, this.InputModel);
+            },
+
+            onGetComponentData: async function(oEvent) {
+                MainControllerHelper.clearMessages(this.MessageStrip, this.MessagePopover, this.InputModel);
+
+                try {
+                    BusyIndicator.show(0);
+                    await this.OrderModel.getComponentData(this.InputModel);
+                    BusyIndicator.hide();
+                } catch (oError) {
+                    BusyIndicator.hide();
+                }
+            },
+
+            onReject: function(oEvent) {
+                MainControllerHelper.clearMessages(this.MessageStrip, this.MessagePopover, this.InputModel);
+
+                this.InputModel.toggleReject();
             }
 		});
 	});

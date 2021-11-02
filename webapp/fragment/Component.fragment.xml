@@ -114,7 +114,8 @@
                             <Input  value="{input>/Component}"
                                     maxLength="40"
                                     type="Text"
-                                    required="true">
+                                    required="true"
+                                    submit="onGetComponentData">
                                 <layoutData>
                                     <l:GridData span="XL3 L3 M3 S8"/>
                                 </layoutData>
@@ -131,7 +132,8 @@
                     </f:FormElement>
                     <f:FormElement>
                         <f:fields>
-                            <Button text="{i18n>getComponentData}">
+                            <Button text="{i18n>scanComponent}"
+                                    press="onScanComponent">
                                 <layoutData>
                                     <l:GridData span="XL2 L2 M2 S4"/>
                                 </layoutData>
@@ -153,8 +155,8 @@
                     </f:FormElement>
                     <f:FormElement>
                         <f:fields>
-                            <Button text="{=${input>Reject}? ${i18n>pass} : ${i18n>reject}}"
-                                    type="{=${input>Reject}? 'Accept' : 'Reject'}"                                    
+                            <Button text="{=${input>/Reject}? ${i18n>pass} : ${i18n>reject}}"
+                                    type="{=${input>/Reject}? 'Accept' : 'Reject'}"                                    
                                     press="onReject">
                                 <layoutData>
                                     <l:GridData span="XL2 L2 M2 S4"/>
@@ -162,14 +164,15 @@
                             </Button>
                         </f:fields>
                     </f:FormElement>
-                    <f:FormElement visible="{=${input>Reject}? true : false}">
+                    <f:FormElement visible="{=${input>/Reject}? true : false}">
                         <f:label>
-                            <Label  text="{i18n>rejectSloc}"/>
+                            <Label  text="{i18n>rejectSloc}"
+                                    design="Bold"/>
                         </f:label>
                         <f:fields>
                             <Input  value="{input>/RejectStorageLocation}"
                                     showValueHelp="true"
-                                    valueHelpRequest="onSLocSearch"
+                                    valueHelpRequest="onRejectSLocSearch"
                                     maxLength="4"
                                     type="Text"
                                     required="true">
@@ -178,13 +181,24 @@
                                 </layoutData>
                                 <customData>
                                     <core:CustomData key="required"
-                                                     value="{=${input>Reject}? true : false}"
+                                                     value="{=${input>/Reject}? 'true' : 'false'}"
                                                      writeToDom="true"/>
                                     <core:CustomData key="name"
                                                      value="{i18n>rejectSloc}"
                                                      writeToDom="true"/>
                                 </customData>
                             </Input>
+                        </f:fields>
+                    </f:FormElement>
+                    <f:FormElement>
+                        <f:label>
+                            <Label/>
+                        </f:label>
+                        <f:fields>
+                            <Text   text="{ parts: [ { path : 'input>/StandardPacking' }, 
+                                                     { path : 'input>/ComponentList' } ],
+                                            formatter: '.formatter.formatStandardPacking' }">
+                            </Text>
                         </f:fields>
                     </f:FormElement>
                 </f:formElements>

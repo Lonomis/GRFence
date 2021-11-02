@@ -18,17 +18,17 @@ sap.ui.define([
             this._OrderModel    =   oModel;
         },
 
-        getOrderData: function(sOrderNo, sTransportationType, sRackNo){
+        getOrderData: function(oInputModel){
             var that = this;
-            var oParameters = this.buildGetOrderParameter(sOrderNo,
-                                                          sTransportationType,
-                                                          sRackNo);
+            var oParameters = this.buildGetOrderParameter(oInputModel);
 
             return new Promise(function(resolve, reject){
                 that._OrderModel.callFunction("/GetOrder", {
                     method          :   "GET",
                     urlParameters   :   oParameters,
                     success         :   function(oData) {
+                        oInputModel.setOrderData(oData.GetOrder);
+
                         resolve({
                             status  :   that.SuccessStatus,
                             details :   oData.GetOrder
@@ -44,46 +44,82 @@ sap.ui.define([
             });
         },
 
-        buildGetOrderParameter: function(sOrderNo, sTransportationType, sRackNo){
+        buildGetOrderParameter: function(oInputModel){
+            var oInputData = oInputModel.getData();
+
             return {
-                "OrderNo"               :   ( !sOrderNo ? "" : sOrderNo),
-                "RackNo"                :   ( !sRackNo ? "" : sRackNo),
-                "TransportationType"    :   ( !sTransportationType ? "" : sTransportationType),
+                "OrderNo"               :   ( !oInputData.ProductionOrder ? "" : oInputData.ProductionOrder),
+                "RackNo"                :   ( !oInputData.RackNo ? "" : oInputData.RackNo),
+                "TransportationType"    :   ( !oInputData.TransportationType ? "" : oInputData.TransportationType),
                 "Flag"                  :   "X"
             }
         },
 
-        postScannedData:    function(oScannedData){
+        getComponentData: function(oInputModel){
             var that = this;
-            var oDataToBePosted =   this.prepareDataToBePosted(oScannedData);
+            var oParameters = this.buildGetMaterialNameParameter(oInputModel);
 
             return new Promise(function(resolve, reject){
-                that._OrderModel.create("/GoodsReceiptPCs", oDataToBePosted, {
-                    success : function(oData) {
+                that._OrderModel.callFunction("/GetMaterialName", {
+                    method          :   "GET",
+                    urlParameters   :   oParameters,
+                    success         :   function(oData) {
+                        oInputModel.setComponentData(oData.GetMaterialName);
+
                         resolve({
                             status  :   that.SuccessStatus,
-                            details :   oData,
-                            message :   that.getPostSuccessMessage(oData.MaterialDocumentNo)
+                            details :   oData.GetMaterialName
                         })
                     },
-                    error : function(oError) {
+                    error           :   function(oError) {
                         reject({
                             status  :   that.ErrorStatus,
-                            details :   oError,
-                            message :   that.getPostErrorMessage()
+                            details :   oError
                         })
-                    }
+                    } 
                 })
-            })
+            });
         },
 
-        prepareDataToBePosted:  function(oScannedData){
+        buildGetMaterialNameParameter: function(oInputModel){
+            var oInputData = oInputModel.getData();
+
             return {
-                TransactionId   :   "1",
-                TransactionCode :   "ZMMO071_303",
-                ToItems         :   this.appendToItems(oScannedData.ScannedData)
+                "Material"               :   ( !oInputData.Component ? "" : oInputData.Component)
             }
         },
+
+        // postScannedData:    function(oScannedData){
+        //     var that = this;
+        //     var oDataToBePosted =   this.prepareDataToBePosted(oScannedData);
+
+        //     return new Promise(function(resolve, reject){
+        //         that._OrderModel.create("/GoodsReceiptPCs", oDataToBePosted, {
+        //             success : function(oData) {
+        //                 resolve({
+        //                     status  :   that.SuccessStatus,
+        //                     details :   oData,
+        //                     message :   that.getPostSuccessMessage(oData.MaterialDocumentNo)
+        //                 })
+        //             },
+        //             error : function(oError) {
+        //                 reject({
+        //                     status  :   that.ErrorStatus,
+        //                     details :   oError,
+        //                     message :   that.getPostErrorMessage()
+        //                 })
+        //             }
+        //         })
+        //     })
+        // },
+
+        // prepareDataToBePosted:  function(oScannedData){
+        //     return {
+        //         TransactionId   :   "1",
+        //         TransactionCode :   "ZMMO071_303",
+        //         ToItems         :   this.appendToItems(oScannedData.ScannedData)
+        //     }
+        // },
 
         appendToItems: function(aScannedDataList){
             var aToItems    =   [];
@@ -114,46 +150,57 @@ sap.ui.define([
             return this._ResourceBundle.getText("post.Error");
         },
 
-        getVendorData: async function(sVendor) {
+        getVendorData: async function(oInputModel) {
             var that = this;
-            var oParameters =   this.buildGetVendorDataParameter(sVendor);
+            var oParameters =   this.buildGetVendorDataParameter(oInputModel);
 
-            return new Promise(function(resolve, reject){
-               that._OrderModel.callFunction("/GetVendorData", {
-                    method          :   "GET",
-                    urlParameters   :   oParameters,
-                    success         :   function(oData){
-                        resolve({
-                            status  :   that.SuccessStatus,
-                            details :   oData.GetVendorData
-                        })
-                    },
-                    error           :   function(oError){
-                        reject({
-                            status  :   that.ErrorStatus,
-                            details :   oError
-                        })
-                    }
-               })
-            });
+            if (oParameters) {
+
+                return new Promise(function(resolve, reject){
+                    that._OrderModel.callFunction("/GetVendorData", {
+                        method          :   "GET",
+                        urlParameters   :   oParameters,
+                        success         :   function(oData){
+                            oInputModel.setVendorData(oData.GetVendorData);
+
+                            resolve({
+                                status  :   that.SuccessStatus,
+                                details :   oData.GetVendorData
+                            })
+                        },
+                        error           :   function(oError){
+                            reject({
+                                status  :   that.ErrorStatus,
+                                details :   oError
+                            })
+                        }
+                    })
+                });
+
+            }
         },
 
-        buildGetVendorDataParameter: function(sVendor) {
-            return {
-                "Vendor"    :   (!sVendor? "" : sVendor)
-            };
+        buildGetVendorDataParameter: function(oInputModel) {
+            var oInputData = oInputModel.getData();
+
+            if (oInputData.Vendor){
+                return {
+                    "Vendor"    :   oInputData.Vendor
+                };
+            }
         },
 
-        getStandardPackingData: function(sMaterial, sOrderNo, sRackID, sRackNo, sTransportationType) {
+        getStandardPackingData: function(oInputModel) {
             var that = this;
-            var oParameters =   this.buildGetStdPackingParameter(sMaterial, sOrderNo, sRackID,
-                                                                 sRackNo, sTransportationType);
+            var oParameters =   this.buildGetStdPackingParameter(oInputModel);
 
             return new Promise(function(resolve, reject){
                that._OrderModel.callFunction("/GetStandardPacking", {
                     method          :   "GET",
                     urlParameters   :   oParameters,
                     success         :   function(oData){
+                        oInputModel.setStandardPacking(oData.results);
+
                         resolve({
                             status  :   that.SuccessStatus,
                             details :   oData.results
@@ -169,14 +216,15 @@ sap.ui.define([
             });
         },
         
-        buildGetStdPackingParameter: function(sMaterial, sOrderNo, sRackID,
-                                              sRackNo, sTransportationType) {
+        buildGetStdPackingParameter: function(oInputModel) {
+            var oInputData = oInputModel.getData();
+
             return {
-                "Material"              :   (!sMaterial? "" : sMaterial),
-                "OrderNo"               :   (!sOrderNo? "" : sOrderNo),
-                "RackId"                :   (!sRackID? "" : sRackID),
-                "RackNo"                :   (!sRackNo? "" : sRackNo),
-                "TransportationType"    :   (!sTransportationType? "": sTransportationType)
+                "Material"              :   (!oInputData.Material? "" : oInputData.Material),
+                "OrderNo"               :   (!oInputData.ProductionOrder? "" : oInputData.ProductionOrder),
+                "RackId"                :   (!oInputData.RackID? "" : oInputData.RackID),
+                "RackNo"                :   (!oInputData.RackNo? "" : oInputData.RackNo),
+                "TransportationType"    :   (!oInputData.TransportationType? "": oInputData.TransportationType)
             };
         }
     });

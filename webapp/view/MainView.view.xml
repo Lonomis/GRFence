@@ -33,13 +33,19 @@
 								<Button
 									text="{i18n>cancel}"
 									type="Reject"
-									visible="{= ${fragment>/activeFragment} === 'Init'}"
+									visible="{= ${fragment>/activeFragment} === 'Init' ||
+                                                ${fragment>/activeFragment} === 'ScannedList'}"
 									press="onCancel"/>
 								<Button
 									text="{i18n>next}"
 									type="Emphasized"
 									visible="{= ${fragment>/activeFragment} === 'Init'}"
 									press="onNext"/>
+								<Button
+									text="{i18n>nextItem}"
+									type="Emphasized"
+									visible="{= ${fragment>/activeFragment} === 'Component'}"
+									press="onNextItem"/>
 								<Button
 									text="{i18n>save}"
 									type="Accept"

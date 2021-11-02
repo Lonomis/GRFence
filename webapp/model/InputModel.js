@@ -23,11 +23,14 @@ sap.ui.define([
                 ProductionVersion       :   "",
                 RackID                  :   "",
                 StorageLocation         :   "",
-                Reject                  :   "",
+                Reject                  :   false,
                 Vendor                  :   "",
                 VendorName              :   "",
+                ItemNo                  :   "",
                 Component               :   "",
                 ComponentName           :   "",
+                Count                   :   "",
+                RejectStorageLocation   :   "",
                 StandardPacking         :   [],
                 ComponentList           :   []
             }
@@ -51,11 +54,111 @@ sap.ui.define([
 
         getInitialComponent         :   function(){
             return {
-                itemNo                  :   "",
+                ItemNo                  :   "",
                 RejectSloc              :   "",
                 Item                    :   "",
                 Count                   :   0,
             }  
+        },
+
+        checkWithStandardPacking    :   function(){
+            var oData               =   this.getData();
+            var oStandardPacking    =   this.getStandardPackingLine(oData.Component, oData.StandardPacking);
+
+            if (oStandardPacking){
+                oData.ItemNo    =   oStandardPacking.ItemNo;
+                this.setData(oData);                
+            } else {
+                throw "Component not found in standard packing";
+            }
+        },
+
+        getStandardPackingLine      :   function(sComponent, aStandardPacking) {
+            var iCounter            =   0;
+
+            while(aStandardPacking[iCounter]){
+                if (aStandardPacking[iCounter].Component === sComponent){
+                    return aStandardPacking[iCounter];
+                }else{
+                    iCounter++;
+                }
+            }
+        },
+
+        validateComponent           :   function(){
+            var oData       =   this.getData();
+
+            if ((oData.ComponentList.length + 1) > oData.StandardPacking.length){
+                throw "Component more than Standard Packing";
+            } else {
+                oData.ItemNo     =   this.getItemNumber(oData);
+                this.setData(oData);
+            }
+        },
+
+        getItemNumber               :   function(oData){
+            var aStdItemNumber      =   this.findStandardPackingInList(oData);
+            var oComponent          =   {};
+            var sErrorFlag          =   true;
+
+            for (let iStdItemNumberCounter in aStdItemNumber){
+                oComponent          =   this.findComponentInList(aStdItemNumber[iStdItemNumberCounter],
+                                                                 oData.ComponentList);
+                if (!oComponent){
+                    sErrorFlag      =   false;
+                    return aStdItemNumber[iStdItemNumberCounter].ItemNo;         
+                }
+            }
+
+            if (aStdItemNumber.length === 0){
+                throw "Component not found in standard packing";
+            } else if(sErrorFlag) {
+                throw "Component already scanned";
+            }
+        },
+        
+        findComponentInList         :   function(oStdItemNumber, aComponentList){
+            for (let iComponentListCounter in aComponentList){
+                if (aComponentList[iComponentListCounter].ItemNo === oStdItemNumber.ItemNo &&
+                    aComponentList[iComponentListCounter].Item   === oStdItemNumber.Component) {
+                    return aComponentList[iComponentListCounter];
+                }
+            }
+        },
+
+        findStandardPackingInList   :   function(oData){
+            var aStandardPacking    =   [];
+
+            for (let iStandardPackingCounter in oData.StandardPacking){
+                if (oData.StandardPacking[iStandardPackingCounter].Component === oData.Component){
+                    aStandardPacking.push({
+                        Component   :   oData.StandardPacking[iStandardPackingCounter].Component,
+                        ItemNo      :   oData.StandardPacking[iStandardPackingCounter].Number
+                    });
+                }
+            }
+
+            return aStandardPacking;
+        },
+        
+        appendComponentData         :   function(){
+            var oData = this.getData();
+
+            oData.ComponentList.push({
+                ItemNo                  :   oData.ItemNo,
+                RejectSloc              :   (oData.Reject? oData.RejectStorageLocation : ""),
+                Item                    :   oData.Component,
+                Count                   :   oData.ComponentList.length + 1
+            });
+
+            oData.Component             =   "";
+            oData.ComponentName         =   "";
+            oData.Count                 =   0;
+            oData.Reject                =   false;
+            oData.RejectStorageLocation =   "";
+
+            this.setData(oData);
+            this.refresh(true);
         },
 
         setModel    :   function(oView, sModelName){
@@ -80,8 +183,10 @@ sap.ui.define([
             oData.Count                 =   oInputdata.Count;
             oData.StorageLocation       =   oInputdata.StorageLocation;
             oData.Reject                =   oInputdata.Reject;
+            oData.RejectStorageLocation =   oInputdata.RejectStorageLocation;
             oData.Vendor                =   oInputdata.Vendor;
             oData.VendorName            =   oInputdata.VendorName;
+            oData.ItemNo                =   oInputdata.ItemNo;
             oData.Component             =   oInputdata.Component;
             oData.ComponentName         =   oInputdata.ComponentName;
             oData.StandardPacking       =   oInputdata.StandardPacking;
@@ -94,20 +199,28 @@ sap.ui.define([
             this._oModel.setData(this.getInitialData());
         },
 
-        setOrderFromBarcode : function(oResult) {
+        setOrderFromBarcode : function(sResult) {
             this.clearOrderData();
             var oInputData	=	this.getData();
 
-            oInputData.ProductionOrder		=   oResult.ProductionOrder;
-            oInputData.TransportationType   =   oResult.TransportationType;
-            oInputData.RackNo               =   oResult.RackNo;
+            oInputData.ProductionOrder		=   (sResult.length >= 12 ? sResult.substring(4,16) : sResult);
+            oInputData.TransportationType   =   (sResult.length >= 24 ? sResult.substring(23,24) : sResult);
+            oInputData.RackNo               =   (sResult.length >= 22 ? sResult.substring(21,23) : sResult);
             this.setData(oInputData);
         },
         
-        setSlocFromBarcode : function(oResult) {
+        setSlocFromBarcode : function(sResult) {
             var oInputData  =   this.getData();
 
-            oInputData.StorageLocation      =   oResult.StorageLocation;
+            oInputData.StorageLocation      =   (sResult.length >= 1 ? sResult.substring(0,4) : sResult);
+            this.setData(oInputData);
+        },
+
+        setComponentFromBarcode : function(sResult) {
+            var oInputData  =   this.getData();
+
+            oInputData.Component            =   (sResult.length >= 22 ? sResult.substring(21,34) : sResult);
+            oInputData.Count                =   (sResult.length >= 58 ? sResult.substring(58,61) : sResult);
             this.setData(oInputData);
         },
 
@@ -118,7 +231,7 @@ sap.ui.define([
         setVendorData: function(oResult) {
             var oData = this.getData();
 
-            oData.VendorName    =   oResult.details.VendorName;
+            oData.VendorName    =   oResult.VendorName;
 
             this.setData(oData);
         },
@@ -126,7 +239,7 @@ sap.ui.define([
         setStandardPacking: function(oResult) {
             var oInputData = this.getData();
 
-            oResult.details.forEach(function(oData){
+            oResult.forEach(function(oData){
                 oInputData.StandardPacking.push({
                     Material                :   oData.Material,
                     Component               :   oData.Component,
@@ -160,8 +273,6 @@ sap.ui.define([
             oData.Plant                 =   "";
             oData.WBS                   =   "";
             oData.ProductionVersion     =   "";
-            oData.RackID                =   "";
-            oData.StorageLocation       =   "";
 
             this.setData(oData);
         },
@@ -172,6 +283,73 @@ sap.ui.define([
             oData.StandardPacking       =   [];
 
             this.setData(oData);
+        },
+
+        clearSlocData: function() {
+            var oData = this.getData();
+
+            oData.StorageLocation       =   "";
+
+            this.setData(oData);
+        },
+
+        clearComponentPageData: function(){
+            var oData = this.getData();
+
+            oData.ItemNo                =   "";
+            oData.Component             =   "";
+            oData.ComponentName         =   "";
+            oData.Count                 =   "";
+            oData.Reject                =   false;
+            oData.RejectStorageLocation =   "";
+            oData.ComponentList         =   [];
+            oData.StandardPacking       =   [];
+
+            this.setData(oData);
+        },
+
+        clearComponentData: function(){
+            var oData = this.getData();
+
+            oData.ItemNo                =   "";
+            oData.Component             =   "";
+            oData.ComponentName         =   "";
+            oData.Count                 =   "";
+            
+            this.setData(oData);
+        },
+
+       setOrderData : function(oResultData){
+            var oInputData = this.getData();
+
+            oInputData.ProductionOrder      =   oResultData.OrderNo;
+            oInputData.TransportationType   =   oResultData.TransportationType;
+            oInputData.RackNo               =   oResultData.RackNo;
+            oInputData.Material			    =	oResultData.Material;
+            oInputData.WBS				    =	oResultData.WBS;
+            oInputData.Plant                =   oResultData.Plant;
+            oInputData.StorageLocation	    =	(!oInputData.StorageLocation? oResultData.StorageLocation: oInputData.StorageLocation);
+            oInputData.ProductionVersion    =   oResultData.ProductionVersion;
+            oInputData.RackID               =   (!oInputData.RackID? oResultData.RackID: oInputData.RackID);
+       
+            this.setData(oInputData);
+        },
+
+        setComponentData : function(oResultData){
+            var oInputData  =   this.getData();
+
+            oInputData.Component        =   oResultData.Material;
+            oInputData.ComponentName    =   oResultData.MaterialName;
+
+            this.setData(oInputData);
+        },
+
+        toggleReject: function() {
+            var oInputData = this.getData();
+
+            oInputData.Reject   =   (oInputData.Reject? false : true);
+            
+            this.setData(oInputData);
         }
         
     });
