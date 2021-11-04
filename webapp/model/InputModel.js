@@ -337,8 +337,6 @@ sap.ui.define([
             var oInputData = this.getData();
 
             oInputData.ProductionOrder      =   oResultData.OrderNo;
-            oInputData.TransportationType   =   oResultData.TransportationType;
-            oInputData.RackNo               =   oResultData.RackNo;
             oInputData.Material			    =	oResultData.Material;
             oInputData.WBS				    =	oResultData.WBS;
             oInputData.Plant                =   oResultData.Plant;
