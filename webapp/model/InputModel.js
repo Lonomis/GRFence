@@ -31,6 +31,7 @@ sap.ui.define([
                 ComponentName           :   "",
                 Count                   :   "",
                 RejectStorageLocation   :   "",
+                Barcode                 :   "",
                 StandardPacking         :   [],
                 ComponentList           :   []
             }
@@ -60,7 +61,8 @@ sap.ui.define([
                 Sloc                    :   "",
                 RejectStatus            :   false,
                 Plant                   :   "",
-                Vendor                  :   ""
+                Vendor                  :   "",
+                Barcode                 :   ""
             }  
         },
 
@@ -154,7 +156,8 @@ sap.ui.define([
                 Item                    :   oData.Component,
                 Count                   :   oData.Count,
                 Plant                   :   oData.Plant,
-                Vendor                  :   oData.Vendor
+                Vendor                  :   oData.Vendor,
+                Barcode                 :   oData.Barcode
             });
 
             oData.Component             =   "";
@@ -195,6 +198,7 @@ sap.ui.define([
             oData.ItemNo                =   oInputdata.ItemNo;
             oData.Component             =   oInputdata.Component;
             oData.ComponentName         =   oInputdata.ComponentName;
+            oData.Barcode               =   oInputdata.Barcode;
             oData.StandardPacking       =   oInputdata.StandardPacking;
             oData.ComponentList         =   oInputdata.ComponentList;
 
@@ -227,6 +231,7 @@ sap.ui.define([
 
             oInputData.Component            =   (sResult.length >= 22 ? sResult.substring(21,34) : sResult);
             oInputData.Count                =   (sResult.length >= 58 ? sResult.substring(58,61) : sResult);
+            oInputData.Barcode              =   sResult;
             this.setData(oInputData);
         },
 
@@ -305,6 +310,7 @@ sap.ui.define([
             oData.ItemNo                =   "";
             oData.Component             =   "";
             oData.ComponentName         =   "";
+            oData.Barcode               =   "";
             oData.Count                 =   "";
             oData.Reject                =   false;
             oData.RejectStorageLocation =   "";
@@ -320,6 +326,7 @@ sap.ui.define([
             oData.ItemNo                =   "";
             oData.Component             =   "";
             oData.ComponentName         =   "";
+            oData.Barcode               =   "";
             oData.Count                 =   "";
             oData.RejectStorageLocation =   "";
             

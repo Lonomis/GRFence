@@ -49,8 +49,8 @@ sap.ui.define([
 
             return {
                 "OrderNo"               :   ( !oInputData.ProductionOrder ? "" : oInputData.ProductionOrder),
-                "RackNo"                :   ( !oInputData.RackNo ? "" : oInputData.RackNo),
-                "TransportationType"    :   ( !oInputData.TransportationType ? "" : oInputData.TransportationType),
+                "RackNo"                :   "00",
+                "TransportationType"    :   "0",
                 "Flag"                  :   "X"
             }
         },
