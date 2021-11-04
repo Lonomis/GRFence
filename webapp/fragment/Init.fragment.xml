@@ -73,7 +73,7 @@
                                     submit="onGetData"
                                     required="true">
                                 <layoutData>
-                                    <l:GridData span="XL2 L2 M2 S4"/>
+                                    <l:GridData span="XL2 L2 M2 S12"/>
                                 </layoutData>
                                 <customData>
                                     <core:CustomData key="required"
@@ -100,7 +100,7 @@
                                     submit="onGetData"
                                     required="true">
                                 <layoutData>
-                                    <l:GridData span="XL2 L2 M2 S4"/>
+                                    <l:GridData span="XL2 L2 M2 S12"/>
                                 </layoutData>
                                 <customData>
                                     <core:CustomData key="required"
@@ -182,7 +182,7 @@
                                     type="Text"
                                     required="true">
                                 <layoutData>
-                                    <l:GridData span="XL2 L2 M2 S4"/>
+                                    <l:GridData span="XL2 L2 M2 S12"/>
                                 </layoutData>
                                 <customData>
                                     <core:CustomData key="required"
@@ -205,7 +205,7 @@
                                     submit="onGetVendorData"
                                     maxLength="10">
                                 <layoutData>
-                                    <l:GridData span="XL2 L2 M2 S6"/>
+                                    <l:GridData span="XL2 L2 M2 S12"/>
                                 </layoutData>
                             </Input>
                         </f:fields>

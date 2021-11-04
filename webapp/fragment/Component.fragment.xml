@@ -146,11 +146,7 @@
                                     design="Bold"/>
                         </f:label>
                         <f:fields>
-                            <Text   text="{input>/ComponentName}">
-                                <layoutData>
-                                    <l:GridData span="XL3 L3 M3 S8"/>
-                                </layoutData>
-                            </Text>
+                            <Text   text="{input>/ComponentName}"/>
                         </f:fields>
                     </f:FormElement>
                     <f:FormElement>
@@ -200,7 +196,7 @@
                                     type="Number"
                                     required="true">
                                 <layoutData>
-                                    <l:GridData span="XL1 L1 M1 S2"/>
+                                    <l:GridData span="XL1 L1 M1 S12"/>
                                 </layoutData>
                                 <customData>
                                     <core:CustomData key="required"
