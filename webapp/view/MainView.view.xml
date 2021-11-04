@@ -10,7 +10,7 @@
 		<App id="app">
 			<pages>
 				<Page id="page" title="{i18n>title}"
-                      showNavButton="{= !!(${fragment>/activeFragment} === 'ScannedList' ||
+                      showNavButton="{= !!(${fragment>/activeFragment} === 'ComponentList' ||
                                         ${fragment>/activeFragment} === 'Component')}"
                       navButtonPress="onBack">
 					<content>
@@ -33,14 +33,23 @@
 								<Button
 									text="{i18n>cancel}"
 									type="Reject"
-									visible="{= ${fragment>/activeFragment} === 'Init' ||
-                                                ${fragment>/activeFragment} === 'ScannedList'}"
+									visible="{= ${fragment>/activeFragment} === 'Init'}"
 									press="onCancel"/>
 								<Button
 									text="{i18n>next}"
 									type="Emphasized"
 									visible="{= ${fragment>/activeFragment} === 'Init'}"
 									press="onNext"/>
+								<Button
+									text="{i18n>goToScannedComponent}"
+									visible="{= ${fragment>/activeFragment} === 'Component'
+                                            &amp;&amp;!!${input>/ComponentList/}.length}"
+									press="onGoToScannedComponent"/>
+								<Button
+									text="{i18n>clearComponent}"
+									type="Reject"
+									visible="{= ${fragment>/activeFragment} === 'Component'}"
+									press="onClearComponent"/>
 								<Button
 									text="{i18n>nextItem}"
 									type="Emphasized"
@@ -49,8 +58,7 @@
 								<Button
 									text="{i18n>save}"
 									type="Accept"
-									visible="{= ${fragment>/activeFragment} === 'Init'
-											&amp;&amp;!!${scannedData>/OrderCount}}"
+									visible="{= ${fragment>/activeFragment} === 'ComponentList'}"
 									press="onSave"/>
 							</content>
 						</OverflowToolbar>

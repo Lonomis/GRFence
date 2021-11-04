@@ -131,6 +131,7 @@ sap.ui.define([
             onCancel: function(){
                 MainControllerHelper.clearMessages(this.MessageStrip, this.MessagePopover, this.InputModel);
                 this.InputModel.clearData();
+                MainControllerHelper.resetInputValueState();
             },
 
 			onSLocSearch: function(oEvent){
@@ -159,6 +160,8 @@ sap.ui.define([
             onNextItem: function(oEvent){
                 MainControllerHelper.clearMessages(this.MessageStrip, this.MessagePopover, this.InputModel);
                 MainControllerHelper.validateRequiredFields(this.MessagePopover);
+                MainControllerHelper.validateCount(this.MessagePopover, this.InputModel);
+                MainControllerHelper.validateRejectSloc(this.MessagePopover, this.InputModel);
                 MainControllerHelper.saveComponent(this.OrderModel, this.InputModel, this.MessagePopover);
             },
 
@@ -209,17 +212,13 @@ sap.ui.define([
                         this.InputModel.clearComponentPageData();
                         this.ScreenManager.loadFragment("Init");
                         break;
-                    case "ScannedList":
+                    case "ComponentList":
                         this.ScreenManager.loadFragment("Component");
                         break;
                     default:
                         break;
                 }
                 
-            },
-
-            onBackToScannedList: function(oEvent) {
-                MainControllerHelper.clearMessages(this.MessageStrip, this.MessagePopover, this.InputModel);
             },
 
             onGetComponentData: async function(oEvent) {
@@ -236,8 +235,35 @@ sap.ui.define([
 
             onReject: function(oEvent) {
                 MainControllerHelper.clearMessages(this.MessageStrip, this.MessagePopover, this.InputModel);
+                MainControllerHelper.resetRejectSlocInput(this.InputModel);
+            },
 
-                this.InputModel.toggleReject();
+            onGoToScannedComponent: function(oEvent){
+                MainControllerHelper.clearMessages(this.MessageStrip, this.MessagePopover, this.InputModel);
+
+                this.ScreenManager.loadFragment("ComponentList");
+            },
+
+            onClearComponent: function(oEvent){
+                MainControllerHelper.clearMessages(this.MessageStrip, this.MessagePopover, this.InputModel);
+                MainControllerHelper.resetInputValueState();
+                this.InputModel.clearComponentData();
+            },
+
+            onSave: async function(oEvent){
+                MainControllerHelper.clearMessages(this.MessageStrip, this.MessagePopover, this.InputModel);
+                MainControllerHelper.validateBeforeSave(this.InputModel, this.MessagePopover);
+
+                try {
+                    BusyIndicator.show(0);
+                    await this.OrderModel.postGoodsReceipt(this.InputModel, this.MessageStrip);
+                    this.InputModel.clearData();
+                    this.ScreenManager.loadFragment("Init");
+                    BusyIndicator.hide();
+                } catch (oError) {
+                    BusyIndicator.hide();
+                }
+                
             }
 		});
 	});

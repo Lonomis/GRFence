@@ -24,20 +24,20 @@ sap.ui.define([
             } catch {
                 BusyIndicator.hide();
             }
-       },
+        },
        
-       openSlocSearchDialog : function(oSlocDialog, oView){
+        openSlocSearchDialog : function(oSlocDialog, oView){
             oSlocDialog.openDialog(oView);
-       },
+        },
 
-       clearMessages : function(oMessageStrip, oMessagePopover, oInputModel) {
+        clearMessages : function(oMessageStrip, oMessagePopover, oInputModel) {
             oInputModel.refresh(true);
             oMessageStrip.clearMessageStrip();
             oMessagePopover.removeAllMessages();
 
-       },
+        },
 
-       validateRequiredFields : function(oMessagePopover){
+        validateRequiredFields : function(oMessagePopover){
             var aRequiredFields         = this.getFields('[data-required="true"]');
             var aMessages               = [];
             var aViolation              = [];
@@ -60,9 +60,9 @@ sap.ui.define([
             if (aMessages.length > 0) {
                 throw new ValidateException(this.combineMessages(aMessages), aViolation);
             }
-       },
+        },
 
-       validateRequiredFieldsOrder : function(oMessagePopover){
+        validateRequiredFieldsOrder : function(oMessagePopover){
             var aRequiredFields         = this.getFields('[data-requiredOrder="true"]');
             var aMessages               = [];
             var aViolation              = [];
@@ -85,20 +85,20 @@ sap.ui.define([
             if (aMessages.length > 0) {
                 throw new ValidateException(this.combineMessages(aMessages), aViolation);
             }
-       },
+        },
 
-       setValueState : function(oField, sValueState, sMessage) {
+        setValueState : function(oField, sValueState, sMessage) {
             if(oField.setValueState){
                 oField.setValueState(sValueState);
                 oField.setValueStateText(sMessage);
             }        
-       },
+        },
 
-       validateValue : function(oMessagePopover){
+        validateValue : function(oMessagePopover){
             this.validateCountField(oMessagePopover);
-       },
+        },
 
-       validateCountField : function(oMessagePopover){
+        validateCountField : function(oMessagePopover){
             var sCountFieldName         =  this._ResourceBundle.getText("count");
             var aCountFields            =  this.getFields('[data-name="' + sCountFieldName +'"]');
             var aMessages               = [];
@@ -129,18 +129,18 @@ sap.ui.define([
             if (aMessages.length > 0) {
                 throw new ValidateException(this.combineMessages(aMessages), aViolation);
             }
-       },
+        },
 
-       resetInputValueState: function(){
+        resetInputValueState: function(){
             var aRequiredFields         = this.getFields('[data-required="true"]');
 
             aRequiredFields.forEach((requiredField)=>{
                 let oField = sap.ui.getCore().byId(requiredField.id);
                 this.setValueState(oField, this._ValueState.None, "");
             });
-       },
+        },
        
-       getFields : function(sSelector){
+        getFields : function(sSelector){
             var aRequireFieldId = [];
 
             $(sSelector).each(function(){
@@ -151,9 +151,9 @@ sap.ui.define([
             });
 
             return aRequireFieldId;
-       },
+        },
        
-       getVendorData: async function(oOrderModel, oInputModel) {
+        getVendorData: async function(oOrderModel, oInputModel) {
             oInputModel.clearVendorData();
             try {
                     BusyIndicator.show(0);
@@ -162,7 +162,7 @@ sap.ui.define([
                 } catch (oError) {
                     BusyIndicator.hide(0);
                 }
-       },
+        },
 
        goToComponent: async function(oOrderModel, oInputModel, oScreenManager) {
            oInputModel.clearOrderData();
@@ -202,6 +202,117 @@ sap.ui.define([
                 BusyIndicator.hide();
                 oMessagePopover.addMessage(oError, this._MessageType.Error);
             }
+        },
+
+        validateRejectSloc: function(oMessagePopover, oInputModel) {
+            var oInputData              =   oInputModel.getData();
+            var sRejectSlocFieldName    =   this._ResourceBundle.getText("rejectSloc");
+            var aRejectSloc             =   this.getFields('[data-name="'+sRejectSlocFieldName+'"]');
+            var aMessages               = [];
+            var aViolation              = [];
+            var sMessage                = "";
+            
+            if (oInputData.Reject) {
+
+                aRejectSloc.forEach((rejectSlocField)=>{
+                    let oField = sap.ui.getCore().byId(rejectSlocField.id);
+                    if (oField.getValue){
+                        if (this.getLastDigit(oField.getValue()) !== this.getLastDigit(oInputData.ProductionVersion)){
+                            sMessage        =   this._ResourceBundle.getText('validate.rejectSlocProdVer', [oInputData.ProductionVersion]);
+                            aMessages.push(sMessage);
+                            aViolation.push("rejectSloc");
+                            oMessagePopover.addMessage(sMessage, this._MessageType.Error);
+
+                            this.setValueState(oField, this._ValueState.Error, sMessage);
+                        } else {
+                            this.setValueState(oField, this._ValueState.None, "");
+                        }
+                    }
+                });
+
+            }
+
+            if (aMessages.length > 0) {
+                throw new ValidateException(this.combineMessages(aMessages), aViolation);
+            }            
+        },
+
+        validateCount: function(oMessagePopover, oInputModel) {
+            var oInputData              =   oInputModel.getData();
+            var sCountFieldName         =   this._ResourceBundle.getText("count");
+            var aCountFields            =   this.getFields('[data-name="'+sCountFieldName+'"]');
+            var aMessages               = [];
+            var aViolation              = [];
+            var sMessage                = "";
+            
+            aCountFields.forEach((countField)=>{
+                let oField = sap.ui.getCore().byId(countField.id);
+                if (oField.getValue){
+                    if (oField.getValue() <= 0 ||
+                        oField.getValue() >  999 ){
+                        sMessage        =   this._ResourceBundle.getText('validate.countLimit', [oField.getValue()]);
+                        aMessages.push(sMessage);
+                        aViolation.push("countLimit");
+                        oMessagePopover.addMessage(sMessage, this._MessageType.Error);
+
+                        this.setValueState(oField, this._ValueState.Error, sMessage);
+                    } else {
+                        this.setValueState(oField, this._ValueState.None, "");
+                    }
+
+                    if (oField.getValue().toString().indexOf('.') >= 0){
+                        sMessage        =   this._ResourceBundle.getText('validate.countDecimal', [oField.getValue()]);
+                        aMessages.push(sMessage);
+                        aViolation.push("countLimit");
+                        oMessagePopover.addMessage(sMessage, this._MessageType.Error);
+
+                        this.setValueState(oField, this._ValueState.Error, sMessage);
+                    } else {
+                        this.setValueState(oField, this._ValueState.None, "");
+                    }
+                }
+            });
+
+            if (aMessages.length > 0) {
+                throw new ValidateException(this.combineMessages(aMessages), aViolation);
+            }            
+        },
+
+        getLastDigit: function(sString){
+            var iLength = sString.length;
+
+            return sString.substring(iLength - 1, iLength);
+        },
+
+        resetRejectSlocInput: function(oInputModel) {
+            oInputModel.toggleReject();
+            
+            var sRejectSlocFieldName    =   this._ResourceBundle.getText("rejectSloc");
+            var aRejectSloc             =   this.getFields('[data-name="'+sRejectSlocFieldName+'"]');
+
+            aRejectSloc.forEach((rejectSloc)=>{
+                let oField = sap.ui.getCore().byId(rejectSloc.id);
+                this.setValueState(oField, this._ValueState.None, "");
+            });
+        },
+
+        validateBeforeSave: function(oInputModel, oMessagePopover) {
+            var oInputData = oInputModel.getData();
+            var aMessages               = [];
+            var aViolation              = [];
+            var sMessage                = "";
+            
+            //Validate Standard Packing and Component List
+            if (oInputData.StandardPacking.length !== oInputData.ComponentList.length){ 
+                sMessage        =   this._ResourceBundle.getText('validate.stdPackingLine');
+                aMessages.push(sMessage);
+                aViolation.push("stdPackingLine");
+                oMessagePopover.addMessage(sMessage, this._MessageType.Error);
+            }
+
+            if (aMessages.length > 0) {
+                throw new ValidateException(this.combineMessages(aMessages), aViolation);
+            }   
         }
     });
 });

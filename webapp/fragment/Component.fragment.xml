@@ -192,6 +192,29 @@
                     </f:FormElement>
                     <f:FormElement>
                         <f:label>
+                            <Label  text="{i18n>count}"
+                                    design="Bold"/>
+                        </f:label>
+                        <f:fields>
+                            <Input  value="{input>/Count}"
+                                    type="Number"
+                                    required="true">
+                                <layoutData>
+                                    <l:GridData span="XL1 L1 M1 S2"/>
+                                </layoutData>
+                                <customData>
+                                    <core:CustomData key="required"
+                                                     value="true"
+                                                     writeToDom="true"/>
+                                    <core:CustomData key="name"
+                                                     value="{i18n>count}"
+                                                     writeToDom="true"/>
+                                </customData>
+                            </Input>
+                        </f:fields>
+                    </f:FormElement>
+                    <f:FormElement>
+                        <f:label>
                             <Label/>
                         </f:label>
                         <f:fields>

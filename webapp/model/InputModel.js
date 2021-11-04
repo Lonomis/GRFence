@@ -55,9 +55,12 @@ sap.ui.define([
         getInitialComponent         :   function(){
             return {
                 ItemNo                  :   "",
-                RejectSloc              :   "",
                 Item                    :   "",
                 Count                   :   0,
+                Sloc                    :   "",
+                RejectStatus            :   false,
+                Plant                   :   "",
+                Vendor                  :   ""
             }  
         },
 
@@ -146,9 +149,12 @@ sap.ui.define([
 
             oData.ComponentList.push({
                 ItemNo                  :   oData.ItemNo,
-                RejectSloc              :   (oData.Reject? oData.RejectStorageLocation : ""),
+                Sloc                    :   (oData.Reject? oData.RejectStorageLocation : oData.StorageLocation),
+                RejectStatus            :   oData.Reject,
                 Item                    :   oData.Component,
-                Count                   :   oData.ComponentList.length + 1
+                Count                   :   oData.Count,
+                Plant                   :   oData.Plant,
+                Vendor                  :   oData.Vendor
             });
 
             oData.Component             =   "";
@@ -315,6 +321,7 @@ sap.ui.define([
             oData.Component             =   "";
             oData.ComponentName         =   "";
             oData.Count                 =   "";
+            oData.RejectStorageLocation =   "";
             
             this.setData(oData);
         },
@@ -347,7 +354,8 @@ sap.ui.define([
         toggleReject: function() {
             var oInputData = this.getData();
 
-            oInputData.Reject   =   (oInputData.Reject? false : true);
+            oInputData.Reject                   =   (oInputData.Reject? false : true);
+            oInputData.RejectStorageLocation    =   "";
             
             this.setData(oInputData);
         }

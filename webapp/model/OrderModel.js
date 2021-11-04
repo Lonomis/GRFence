@@ -89,56 +89,66 @@ sap.ui.define([
             }
         },
 
-        // postScannedData:    function(oScannedData){
-        //     var that = this;
-        //     var oDataToBePosted =   this.prepareDataToBePosted(oScannedData);
+        postGoodsReceipt:    function(oInputModel, oMessageStrip){
+            var that = this;
+            var oDataToBePosted =   this.prepareDataToBePosted(oInputModel);
 
-        //     return new Promise(function(resolve, reject){
-        //         that._OrderModel.create("/GoodsReceiptPCs", oDataToBePosted, {
-        //             success : function(oData) {
-        //                 resolve({
-        //                     status  :   that.SuccessStatus,
-        //                     details :   oData,
-        //                     message :   that.getPostSuccessMessage(oData.MaterialDocumentNo)
-        //                 })
-        //             },
-        //             error : function(oError) {
-        //                 reject({
-        //                     status  :   that.ErrorStatus,
-        //                     details :   oError,
-        //                     message :   that.getPostErrorMessage()
-        //                 })
-        //             }
-        //         })
-        //     })
-        // },
+            return new Promise(function(resolve, reject){
+                that._OrderModel.create("/GoodsReceipts", oDataToBePosted, {
+                    success : function(oData) {
+                        oMessageStrip.showMessageStrip(that.getPostSuccessMessage(oData.MaterialDocumentNo), that.SuccessStatus);
+                        resolve({
+                            status  :   that.SuccessStatus,
+                            details :   oData
+                        })
+                    },
+                    error : function(oError) {
+                        oMessageStrip.showMessageStrip(that.getPostErrorMessage(), that.ErrorStatus);
+                        reject({
+                            status  :   that.ErrorStatus,
+                            details :   oError,
+                            message :   that.getPostErrorMessage()
+                        })
+                    }
+                })
+            })
+        },
 
-        // prepareDataToBePosted:  function(oScannedData){
-        //     return {
-        //         TransactionId   :   "1",
-        //         TransactionCode :   "ZMMO071_303",
-        //         ToItems         :   this.appendToItems(oScannedData.ScannedData)
-        //     }
-        // },
+        prepareDataToBePosted:  function(oInputModel){
+            var oData = oInputModel.getData();
 
-        appendToItems: function(aScannedDataList){
-            var aToItems    =   [];
+            return {
+                TransactionId       :   "1",
+                TransactionCode     :   "ZMMO071_101",
+                ProductionOrder     :   oData.ProductionOrder,
+                Plant               :   oData.Plant,
+                RackId              :   oData.RackID,
+                WBS                 :   oData.WBS,
+                StorageLocation     :   oData.StorageLocation,
+                RackNo              :   oData.RackNo,
+                TransportationType  :   oData.TransportationType,
+                Vendor              :   oData.Vendor,
+                ToGRItems           :   this.appendToGRItems(oData.ComponentList)
+            }
+        },
 
-            aScannedDataList.forEach(function(oScannedData){
-                aToItems.push({
+        appendToGRItems: function(aComponentList){
+            var aToGRItems    =   [];
+
+            aComponentList.forEach(function(oComponent){
+                aToGRItems.push({
                     TransactionId   :   "1",
-                    ItemNo          :   oScannedData.ItemNo.toString(),
-                    Reject          :   ( oScannedData.Reject ? "X" : "" ),
-                    Material        :   oScannedData.Material,
-                    Plant           :   oScannedData.Plant,
-                    StorageLocation :   oScannedData.StorageLocation,
-                    Vendor          :   oScannedData.Vendor,
-                    Count           :   oScannedData.Count.toString(),
-                    OrderNo         :   oScannedData.OrderNo
+                    ItemNo          :   oComponent.ItemNo,
+                    Item            :   oComponent.Item,
+                    StorageLocation :   oComponent.Sloc,
+                    Reject          :   ( oComponent.RejectStatus ? "X" : "" ),
+                    Plant           :   oComponent.Plant,
+                    Vendor          :   oComponent.Vendor,
+                    Count           :   oComponent.Count.toString()
                 });
             });
 
-            return aToItems;
+            return aToGRItems;
         },
 
         getPostSuccessMessage: function(sMaterialDocumentNo) {
