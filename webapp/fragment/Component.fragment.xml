@@ -146,7 +146,11 @@
                                     design="Bold"/>
                         </f:label>
                         <f:fields>
-                            <Text   text="{input>/ComponentName}"/>
+                            <Text   text="{input>/ComponentName}">
+                                <layoutData>
+                                    <l:GridData span="XL3 L3 M3 S8"/>
+                                </layoutData>
+                            </Text>
                         </f:fields>
                     </f:FormElement>
                     <f:FormElement>
