@@ -144,7 +144,8 @@ sap.ui.define([
                     Reject          :   ( oComponent.RejectStatus ? "X" : "" ),
                     Plant           :   oComponent.Plant,
                     Vendor          :   oComponent.Vendor,
-                    Count           :   oComponent.Count.toString()
+                    Count           :   oComponent.Count.toString(),
+                    Barcode         :   oComponent.Barcode
                 });
             });
 
