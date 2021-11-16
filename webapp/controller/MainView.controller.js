@@ -240,7 +240,7 @@ sap.ui.define([
 
             onGoToScannedComponent: function(oEvent){
                 MainControllerHelper.clearMessages(this.MessageStrip, this.MessagePopover, this.InputModel);
-
+                MainControllerHelper.resetInputValueState();
                 this.ScreenManager.loadFragment("ComponentList");
             },
 
