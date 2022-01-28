@@ -19,6 +19,7 @@
                 columnsXL="1"
                 columnsL="1"
                 columnsM="1"
+                breakpointM="650"
                 singleContainerFullSize="false"/>
         </f:layout>
         <f:formContainers>
@@ -117,7 +118,7 @@
                                     required="true"
                                     submit="onGetComponentData">
                                 <layoutData>
-                                    <l:GridData span="XL3 L3 M3 S8"/>
+                                    <l:GridData span="L4 M4 S8"/>
                                 </layoutData>
                                 <customData>
                                     <core:CustomData key="required"
@@ -135,7 +136,7 @@
                             <Button text="{i18n>scanComponent}"
                                     press="onScanComponent">
                                 <layoutData>
-                                    <l:GridData span="XL2 L2 M2 S4"/>
+                                    <l:GridData span="L3 M3 S4"/>
                                 </layoutData>
                             </Button>
                         </f:fields>
@@ -148,7 +149,7 @@
                         <f:fields>
                             <Text   text="{input>/ComponentName}">
                                 <layoutData>
-                                    <l:GridData span="XL3 L3 M3 S8"/>
+                                    <l:GridData span="L4 M4 S8"/>
                                 </layoutData>
                             </Text>
                         </f:fields>
@@ -159,7 +160,7 @@
                                     type="{=${input>/Reject}? 'Accept' : 'Reject'}"                                    
                                     press="onReject">
                                 <layoutData>
-                                    <l:GridData span="XL2 L2 M2 S4"/>
+                                    <l:GridData span="L3 M3 S8"/>
                                 </layoutData>
                             </Button>
                         </f:fields>
@@ -177,7 +178,7 @@
                                     type="Text"
                                     required="true">
                                 <layoutData>
-                                    <l:GridData span="XL3 L3 M3 S8"/>
+                                    <l:GridData span="L2 M2 S4"/>
                                 </layoutData>
                                 <customData>
                                     <core:CustomData key="required"
@@ -200,7 +201,7 @@
                                     type="Number"
                                     required="true">
                                 <layoutData>
-                                    <l:GridData span="XL1 L1 M1 S12"/>
+                                    <l:GridData span="L2 M2 S12"/>
                                 </layoutData>
                                 <customData>
                                     <core:CustomData key="required"

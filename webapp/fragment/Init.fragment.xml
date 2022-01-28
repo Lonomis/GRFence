@@ -14,11 +14,12 @@
                 adjustLabelSpan="false"
                 emptySpanXL="4"
                 emptySpanL="4"
-                emptySpanM="4"
+                emptySpanM="2"
                 emptySpanS="0"
                 columnsXL="1"
                 columnsL="1"
                 columnsM="1"
+                breakpointM="650"
                 singleContainerFullSize="false"/>
         </f:layout>
         <f:formContainers>
@@ -35,7 +36,7 @@
                                     submit="onGetData"
                                     required="true">
                                 <layoutData>
-                                    <l:GridData span="XL2 L2 M2 S6"/>
+                                    <l:GridData span="L4 M4 S8"/>
                                 </layoutData>
                                 <customData>
                                     <core:CustomData key="required"
@@ -57,7 +58,7 @@
                                     press="onScanOrder"
 									visible="{= ${barcode>/available}}">
                                 <layoutData>
-                                    <l:GridData span="XL2 L2 M2 S6"/>
+                                    <l:GridData span="L3 M3 S4"/>
                                 </layoutData>
                             </Button>
                         </f:fields>
@@ -73,7 +74,7 @@
                                     submit="onGetData"
                                     required="true">
                                 <layoutData>
-                                    <l:GridData span="XL2 L2 M2 S12"/>
+                                    <l:GridData span="L4 M4 S12"/>
                                 </layoutData>
                                 <customData>
                                     <core:CustomData key="required"
@@ -100,7 +101,7 @@
                                     submit="onGetData"
                                     required="true">
                                 <layoutData>
-                                    <l:GridData span="XL2 L2 M2 S12"/>
+                                    <l:GridData span="L4 M4 S12"/>
                                 </layoutData>
                                 <customData>
                                     <core:CustomData key="required"
@@ -147,7 +148,7 @@
                                     type="Text"
                                     required="true">
                                 <layoutData>
-                                    <l:GridData span="XL2 L2 M2 S6"/>
+                                    <l:GridData span="L4 M4 S8"/>
                                 </layoutData>
                                 <customData>
                                     <core:CustomData key="required"
@@ -166,7 +167,7 @@
                                     press="onScanSloc"
 									visible="{= ${barcode>/available}}">
                                 <layoutData>
-                                    <l:GridData span="XL2 L2 M2 S6"/>
+                                    <l:GridData span="L3 M3 S4"/>
                                 </layoutData>
                             </Button>
                         </f:fields>
@@ -182,7 +183,7 @@
                                     type="Text"
                                     required="true">
                                 <layoutData>
-                                    <l:GridData span="XL2 L2 M2 S12"/>
+                                    <l:GridData span="L4 M4 S12"/>
                                 </layoutData>
                                 <customData>
                                     <core:CustomData key="required"
@@ -205,7 +206,7 @@
                                     submit="onGetVendorData"
                                     maxLength="10">
                                 <layoutData>
-                                    <l:GridData span="XL2 L2 M2 S12"/>
+                                    <l:GridData span="L4 M4 S12"/>
                                 </layoutData>
                             </Input>
                         </f:fields>
