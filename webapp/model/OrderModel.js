@@ -127,7 +127,6 @@ sap.ui.define([
                 StorageLocation     :   oData.StorageLocation,
                 RackNo              :   oData.RackNo,
                 TransportationType  :   oData.TransportationType,
-                Vendor              :   oData.Vendor,
                 ToGRItems           :   this.appendToGRItems(oData.ComponentList)
             }
         },
