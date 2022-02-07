@@ -196,30 +196,6 @@
                             </Input>
                         </f:fields>
                     </f:FormElement>
-                    <f:FormElement>
-                        <f:label>
-                            <Label  text="{i18n>vendor}"
-                                    design="Bold"/>
-                        </f:label>
-                        <f:fields>
-                            <Input  value="{input>/Vendor}"
-                                    submit="onGetVendorData"
-                                    maxLength="10">
-                                <layoutData>
-                                    <l:GridData span="L4 M4 S12"/>
-                                </layoutData>
-                            </Input>
-                        </f:fields>
-                    </f:FormElement>
-                    <f:FormElement>
-                        <f:label>
-                            <Label  text="{i18n>vendorName}"
-                                    design="Bold"/>
-                        </f:label>
-                        <f:fields>
-                            <Text   text="{input>/VendorName}"/>
-                        </f:fields>
-                    </f:FormElement>
                 </f:formElements>
             </f:FormContainer>
         </f:formContainers>

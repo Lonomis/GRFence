@@ -166,13 +166,11 @@ sap.ui.define([
 
        goToComponent: async function(oOrderModel, oInputModel, oScreenManager) {
            oInputModel.clearOrderData();
-           oInputModel.clearVendorData();
            oInputModel.clearStandardPacking();
 
            try {
                 BusyIndicator.show(0);
                 await oOrderModel.getOrderData(oInputModel);
-                await oOrderModel.getVendorData(oInputModel);
                 await oOrderModel.getStandardPackingData(oInputModel);
                 oScreenManager.loadFragment("Component");
                 BusyIndicator.hide();
@@ -195,6 +193,7 @@ sap.ui.define([
             try {
                 BusyIndicator.show(0);
                 await oOrderModel.getComponentData(oInputModel);
+                await oOrderModel.getVendorData(oInputModel);
                 oInputModel.validateComponent();
                 oInputModel.appendComponentData();
                 BusyIndicator.hide();

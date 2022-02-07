@@ -94,7 +94,13 @@
                                     design="Bold"/>
                         </f:label>
                         <f:fields>
-                            <Text   text="{input>/Vendor}"/>
+                            <Input  value="{input>/Vendor}"
+                                    submit="onGetVendorData"
+                                    maxLength="10">
+                                <layoutData>
+                                    <l:GridData span="L4 M4 S12"/>
+                                </layoutData>
+                            </Input>
                         </f:fields>
                     </f:FormElement>
                     <f:FormElement>

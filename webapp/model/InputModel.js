@@ -160,6 +160,8 @@ sap.ui.define([
                 Barcode                 :   oData.Barcode
             });
 
+            oData.Vendor                =   "";
+            oData.VendorName            =   "";
             oData.Component             =   "";
             oData.ComponentName         =   "";
             oData.Count                 =   0;
@@ -307,6 +309,8 @@ sap.ui.define([
         clearComponentPageData: function(){
             var oData = this.getData();
 
+            oData.Vendor                =   "";
+            oData.VendorName            =   "";
             oData.ItemNo                =   "";
             oData.Component             =   "";
             oData.ComponentName         =   "";
@@ -322,7 +326,9 @@ sap.ui.define([
 
         clearComponentData: function(){
             var oData = this.getData();
-
+            
+            oData.Vendor                =   "";
+            oData.VendorName            =   "";
             oData.ItemNo                =   "";
             oData.Component             =   "";
             oData.ComponentName         =   "";
