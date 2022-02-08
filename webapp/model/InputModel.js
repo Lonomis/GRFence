@@ -369,6 +369,15 @@ sap.ui.define([
             oInputData.RejectStorageLocation    =   "";
             
             this.setData(oInputData);
+        },
+
+        setVendorFromComponent : function(oResultData){
+            var oInputData  =   this.getData();
+            
+            oInputData.Vendor           =   oResultData.Vendor;
+            oInputData.VendorName       =   oResultData.VendorName;
+
+            this.setData(oInputData);
         }
         
     });

@@ -236,6 +236,42 @@ sap.ui.define([
                 "RackNo"                :   (!oInputData.RackNo? "" : oInputData.RackNo),
                 "TransportationType"    :   (!oInputData.TransportationType? "": oInputData.TransportationType)
             };
+        },
+
+        getVendorComponent: function(oInputModel){
+            var that = this;
+            var oParameters = this.buildGetVendorComponentParameter(oInputModel);
+
+            return new Promise(function(resolve, reject){
+                that._OrderModel.callFunction("/GetVendorFromComponent", {
+                    method          :   "GET",
+                    urlParameters   :   oParameters,
+                    success         :   function(oData) {
+                        oInputModel.setVendorFromComponent(oData.GetVendorFromComponent);
+
+                        resolve({
+                            status  :   that.SuccessStatus,
+                            details :   oData.GetVendorFromComponent
+                        })
+                    },
+                    error           :   function(oError) {
+                        reject({
+                            status  :   that.ErrorStatus,
+                            details :   oError
+                        })
+                    } 
+                })
+            });
+        },
+
+        buildGetVendorComponentParameter: function(oInputModel) {
+            var oInputData = oInputModel.getData();
+
+            return {
+                "OrderNo"               :   (!oInputData.ProductionOrder? "" : oInputData.ProductionOrder),
+                "Material"              :   (!oInputData.Component? "" : oInputData.Component)
+            };
         }
+
     });
 });
