@@ -142,7 +142,7 @@
                                     type="{=${input>/Reject}? 'Accept' : 'Reject'}"                                    
                                     press="onReject">
                                 <layoutData>
-                                    <l:GridData span="L3 M3 S8"/>
+                                    <l:GridData span="L3 M3 S4"/>
                                 </layoutData>
                             </Button>
                         </f:fields>
