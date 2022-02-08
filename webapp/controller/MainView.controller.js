@@ -197,12 +197,12 @@ sap.ui.define([
 
                     BusyIndicator.show(0);
                     await this.OrderModel.getComponentData(this.InputModel);
-                    BusyIndicator.hide();
                 } catch (oError) {
                     BusyIndicator.hide();
                 }
 
                 await this.OrderModel.getVendorComponent(this.InputModel);
+                BusyIndicator.hide();
             },
 
             onBack: function(oEvent) {
@@ -229,12 +229,12 @@ sap.ui.define([
                 try {
                     BusyIndicator.show(0);
                     await this.OrderModel.getComponentData(this.InputModel);
-                    BusyIndicator.hide();
                 } catch (oError) {
                     BusyIndicator.hide();
                 }
 
                 await this.OrderModel.getVendorComponent(this.InputModel);
+                BusyIndicator.hide();
             },
 
             onReject: function(oEvent) {
