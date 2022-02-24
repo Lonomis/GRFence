@@ -199,7 +199,11 @@ sap.ui.define([
                 BusyIndicator.hide();
             } catch (oError) {
                 BusyIndicator.hide();
-                oMessagePopover.addMessage(oError, this._MessageType.Error);
+
+                if (typeof oError === 'string' || oError instanceof String ){
+                    oMessagePopover.addMessage(oError, this._MessageType.Error);
+                }
+                
             }
         },
 

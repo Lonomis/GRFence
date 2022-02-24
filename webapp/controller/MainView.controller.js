@@ -194,10 +194,8 @@ sap.ui.define([
 
                 try{
                     await this.BarcodeScanner.scanComponent(this.InputModel);
-
                     BusyIndicator.show(0);
                     await this.OrderModel.getComponentData(this.InputModel);
-                    await this.OrderModel.getVendorComponent(this.InputModel);
                     BusyIndicator.hide();
                 } catch (oError) {
                     BusyIndicator.hide();
@@ -229,7 +227,6 @@ sap.ui.define([
                 try {
                     BusyIndicator.show(0);
                     await this.OrderModel.getComponentData(this.InputModel);
-                    await this.OrderModel.getVendorComponent(this.InputModel);
                     BusyIndicator.hide();
                 } catch (oError) {
                     BusyIndicator.hide();
