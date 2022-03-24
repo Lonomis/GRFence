@@ -232,7 +232,7 @@ sap.ui.define([
             var oInputData  =   this.getData();
 
             oInputData.Component            =   (sResult.length >= 22 ? sResult.substring(21,34) : sResult);
-            oInputData.Count                =   parseInt((sResult.length >= 58 ? sResult.substring(58,61) : sResult));
+            oInputData.Count                =   parseInt((sResult.length >= 58 ? sResult.substring(57,60) : sResult));
             oInputData.Barcode              =   sResult;
             this.setData(oInputData);
         },
